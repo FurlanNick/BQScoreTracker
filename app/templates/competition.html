@@ -6,10 +6,13 @@
     <title>Competition</title>
 </head>
 <body>
-    <h1>Select Competition</h1>
+    <h1>Select Competition for {{ district }}</h1>
     <ul>
         <li><a href="/standings">Overall Standings</a></li>
         <li><a href="/quiz-meet">Quiz Meets</a></li>
+        {% if session.username == 'Admin' %}
+        <li><a href="/accounts">Accounts</a></li>
+        {% endif %}
     </ul>
 </body>
 </html>
