@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz List</title>
+</head>
+<body>
+    <h1>Quizzes for Room {{ room_number }} in Quiz Meet {{ meet_number }}</h1>
+    <ul>
+        {% for quiz_number in range(1, 4) %}
+        <li><a href="/quiz/{{ room_number }}.{{ quiz_number }}">Quiz {{ room_number }}.{{ quiz_number }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
