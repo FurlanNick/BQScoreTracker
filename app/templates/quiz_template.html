@@ -25,5 +25,14 @@
         </tr>
         {% endfor %}
     </table>
+
+    {% if session.username and users[session.username].role in ['Admin', 'District', 'Official'] %}
+    <h2>Edit Quiz</h2>
+    <form action="/edit_quiz/{{ quiz_name }}" method="post">
+        <label for="score">Score:</label><br>
+        <input type="text" id="score" name="score"><br><br>
+        <input type="submit" value="Update Score">
+    </form>
+    {% endif %}
 </body>
 </html>
