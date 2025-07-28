@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+import json
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'  # This should be a random, secret value
@@ -7,6 +8,10 @@ app.secret_key = 'super_secret_key'  # This should be a random, secret value
 users = {
     'Admin': {'password': 'Admin', 'district': 'All'}
 }
+
+def parse_quiz_template():
+    with open('template.json', 'r') as f:
+        return json.load(f)
 
 @app.route('/')
 def index():
@@ -41,13 +46,18 @@ def standings():
 def quiz_meet():
     return render_template('quiz-meet.html')
 
-@app.route('/schedule')
-def schedule():
-    return render_template('schedule.html')
+@app.route('/quiz-meet/<int:meet_number>')
+def rooms(meet_number):
+    return render_template('rooms.html', meet_number=meet_number)
 
-@app.route('/quiz')
-def quiz():
-    return render_template('quiz.html')
+@app.route('/quiz-meet/<int:meet_number>/room/<int:room_number>')
+def quiz_list(meet_number, room_number):
+    return render_template('quiz-list.html', meet_number=meet_number, room_number=room_number)
+
+@app.route('/quiz/<quiz_name>')
+def quiz(quiz_name):
+    quiz_data = parse_quiz_template()
+    return render_template('quiz_template.html', quiz_name=quiz_name, quiz_data=quiz_data)
 
 @app.route('/accounts')
 def accounts():
@@ -70,4 +80,4 @@ def add_user():
     return redirect(url_for('accounts'))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8089)
+    app.run(host='0.0.0.0', port=8090)
