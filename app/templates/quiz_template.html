@@ -16,6 +16,15 @@
 </head>
 <body>
     <h1>Quiz {{ quiz_name }}</h1>
+
+    <label for="team">Select Team:</label>
+    <select id="team" name="team">
+        {% for team_name in teams %}
+        <option value="{{ team_name }}">{{ team_name }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
     <table>
         {% for row in quiz_data %}
         <tr>

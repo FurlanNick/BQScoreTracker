@@ -20,6 +20,9 @@ districts = [
     "Ohio Valley District"
 ]
 
+# In-memory team database
+teams = {}
+
 from functools import wraps
 
 def role_required(required_role):
@@ -85,7 +88,7 @@ def quiz_list(meet_number, room_number):
 @app.route('/quiz/<quiz_name>')
 def quiz(quiz_name):
     quiz_data = parse_quiz_template()
-    return render_template('quiz_template.html', quiz_name=quiz_name, quiz_data=quiz_data, users=users)
+    return render_template('quiz_template.html', quiz_name=quiz_name, quiz_data=quiz_data, users=users, teams=teams)
 
 @app.route('/accounts')
 @role_required('Admin')
@@ -123,6 +126,20 @@ def edit_quiz(quiz_name):
     print(f"Quiz {quiz_name} score updated to: {score}")
 
     return redirect(url_for('quiz', quiz_name=quiz_name))
+
+@app.route('/create_team', methods=['GET', 'POST'])
+def create_team():
+    if request.method == 'POST':
+        team_name = request.form['team_name']
+        coaches = request.form.getlist('coaches')
+        quizzers = request.form.getlist('quizzers')
+
+        if team_name not in teams:
+            teams[team_name] = {'coaches': coaches, 'quizzers': quizzers}
+
+        return redirect(url_for('competition'))
+
+    return render_template('create_team.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8090)

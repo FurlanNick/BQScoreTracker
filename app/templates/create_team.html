@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Team</title>
+</head>
+<body>
+    <h1>Create a New Team</h1>
+    <form action="/create_team" method="post">
+        <label for="team_name">Team Name:</label><br>
+        <input type="text" id="team_name" name="team_name" required><br><br>
+
+        <div id="coaches">
+            <label for="coach1">Coach (1):</label><br>
+            <input type="text" id="coach1" name="coaches" required><br><br>
+        </div>
+        <button type="button" onclick="addCoach()">+ Add Coach</button><br><br>
+
+        <div id="quizzers">
+            <label for="quizzer1">Quizzer (Captain):</label><br>
+            <input type="text" id="quizzer1" name="quizzers" required><br><br>
+        </div>
+        <button type="button" onclick="addQuizzer()">+ Add Quizzer</button><br><br>
+
+        <input type="submit" value="Create Team">
+    </form>
+
+    <script>
+        let coachCount = 1;
+        function addCoach() {
+            if (coachCount < 2) {
+                coachCount++;
+                const newCoach = document.createElement('div');
+                newCoach.innerHTML = `
+                    <label for="coach${coachCount}">Coach (${coachCount}):</label><br>
+                    <input type="text" id="coach${coachCount}" name="coaches"><br><br>
+                `;
+                document.getElementById('coaches').appendChild(newCoach);
+            }
+        }
+
+        let quizzerCount = 1;
+        function addQuizzer() {
+            if (quizzerCount < 5) {
+                quizzerCount++;
+                const newQuizzer = document.createElement('div');
+                let label = `Quizzer (${quizzerCount})`;
+                if (quizzerCount === 2) {
+                    label = 'Quizzer (Co-Captain)';
+                }
+                newQuizzer.innerHTML = `
+                    <label for="quizzer${quizzerCount}">${label}:</label><br>
+                    <input type="text" id="quizzer${quizzerCount}" name="quizzers"><br><br>
+                `;
+                document.getElementById('quizzers').appendChild(newQuizzer);
+            }
+        }
+    </script>
+</body>
+</html>
