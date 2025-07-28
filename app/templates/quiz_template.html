@@ -16,6 +16,15 @@
 </head>
 <body>
     <h1>Quiz {{ quiz_name }}</h1>
+
+    <label for="team">Select Team:</label>
+    <select id="team" name="team">
+        {% for team_name in teams %}
+        <option value="{{ team_name }}">{{ team_name }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
     <table>
         {% for row in quiz_data %}
         <tr>
@@ -25,5 +34,14 @@
         </tr>
         {% endfor %}
     </table>
+
+    {% if session.username and users[session.username].role in ['Admin', 'District', 'Official'] %}
+    <h2>Edit Quiz</h2>
+    <form action="/edit_quiz/{{ quiz_name }}" method="post">
+        <label for="score">Score:</label><br>
+        <input type="text" id="score" name="score"><br><br>
+        <input type="submit" value="Update Score">
+    </form>
+    {% endif %}
 </body>
 </html>

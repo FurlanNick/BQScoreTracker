@@ -6,8 +6,39 @@ app.secret_key = 'super_secret_key'  # This should be a random, secret value
 
 # In-memory user database
 users = {
-    'Admin': {'password': 'Admin', 'district': 'All'}
+    'Admin': {'password': 'Admin', 'district': 'All', 'role': 'Admin'}
 }
+
+districts = [
+    "Eastern Canadian District",
+    "Central Canadian District",
+    "Canadian Midwest District",
+    "Western Canadian District",
+    "Great Lakes District",
+    "Western Great Lakes District",
+    "Central District",
+    "Ohio Valley District"
+]
+
+# In-memory team database
+teams = {}
+
+from functools import wraps
+
+def role_required(required_role):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'username' not in session:
+                return redirect(url_for('login'))
+
+            user_role = users[session['username']]['role']
+            if user_role != required_role and user_role != 'Admin':
+                return redirect(url_for('competition'))
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 def parse_quiz_template():
     with open('template.json', 'r') as f:
@@ -57,27 +88,58 @@ def quiz_list(meet_number, room_number):
 @app.route('/quiz/<quiz_name>')
 def quiz(quiz_name):
     quiz_data = parse_quiz_template()
-    return render_template('quiz_template.html', quiz_name=quiz_name, quiz_data=quiz_data)
+    return render_template('quiz_template.html', quiz_name=quiz_name, quiz_data=quiz_data, users=users, teams=teams)
 
 @app.route('/accounts')
+@role_required('Admin')
 def accounts():
-    if 'username' not in session or session['username'] != 'Admin':
-        return redirect(url_for('login'))
-    return render_template('accounts.html', users=users)
+    return render_template('accounts.html', users=users, districts=districts)
 
 @app.route('/add_user', methods=['POST'])
+@role_required('Admin')
 def add_user():
-    if 'username' not in session or session['username'] != 'Admin':
-        return redirect(url_for('login'))
-
     username = request.form['username']
     password = request.form['password']
+    role = request.form['role']
     district = request.form['district']
 
     if username not in users:
-        users[username] = {'password': password, 'district': district}
+        users[username] = {'password': password, 'district': district, 'role': role}
 
     return redirect(url_for('accounts'))
+
+@app.route('/add_district', methods=['POST'])
+@role_required('Admin')
+def add_district():
+    new_district = request.form['new_district']
+    if new_district not in districts:
+        districts.append(new_district)
+
+    return redirect(url_for('accounts'))
+
+@app.route('/edit_quiz/<quiz_name>', methods=['POST'])
+def edit_quiz(quiz_name):
+    if 'username' not in session or users[session['username']]['role'] not in ['Admin', 'District', 'Official']:
+        return redirect(url_for('login'))
+
+    score = request.form['score']
+    print(f"Quiz {quiz_name} score updated to: {score}")
+
+    return redirect(url_for('quiz', quiz_name=quiz_name))
+
+@app.route('/create_team', methods=['GET', 'POST'])
+def create_team():
+    if request.method == 'POST':
+        team_name = request.form['team_name']
+        coaches = request.form.getlist('coaches')
+        quizzers = request.form.getlist('quizzers')
+
+        if team_name not in teams:
+            teams[team_name] = {'coaches': coaches, 'quizzers': quizzers}
+
+        return redirect(url_for('competition'))
+
+    return render_template('create_team.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8090)
