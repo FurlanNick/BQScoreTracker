@@ -144,8 +144,10 @@ def quiz_list(meet_number, room_number):
 @app.route('/quiz/<quiz_name>')
 def quiz(quiz_name):
     conn = get_db_connection()
-    teams = conn.execute('SELECT * FROM teams').fetchall()
+    teams_from_db = conn.execute('SELECT * FROM teams').fetchall()
+    teams = [dict(row) for row in teams_from_db]
     users = conn.execute('SELECT * FROM users').fetchall()
+    users = [dict(row) for row in users_from_db]
     conn.close()
     return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams)
 
