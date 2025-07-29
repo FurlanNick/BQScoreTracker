@@ -33,6 +33,11 @@ def role_required(required_role):
             if 'username' not in session:
                 return redirect(url_for('login'))
 
+            conn = get_db_connection()
+            user = conn.execute('SELECT * FROM users WHERE username = ?', (session['username'],)).fetchone()
+            conn.close()
+
+            if user['role'] != required_role and user['role'] != 'Admin':
                 return redirect(url_for('competition'))
 
             return f(*args, **kwargs)
@@ -140,6 +145,7 @@ def quiz_list(meet_number, room_number):
 def quiz(quiz_name):
     conn = get_db_connection()
     teams = conn.execute('SELECT * FROM teams').fetchall()
+    users = conn.execute('SELECT * FROM users').fetchall()
     conn.close()
     return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams)
 
