@@ -23,13 +23,15 @@
 
 
     <table>
+        {% set team_index = 0 %}
         {% for row in quiz_data %}
         <tr>
             {% for key, value in row.items() %}
-                {% if key == 'Team' and loop.parent.loop.index > 11 and loop.parent.loop.index < 14 %}
+                {% if key == 'Team' and 'TEAM' in row.values() %}
+                    {% set team_index = team_index + 1 %}
                     <td>
-                        <input type="checkbox" name="on_time_{{ loop.parent.loop.index - 11 }}" checked> On Time
-                        <select name="team_{{ loop.parent.loop.index - 11 }}">
+                        <input type="checkbox" name="on_time_{{ team_index }}" checked> On Time
+                        <select name="team_{{ team_index }}">
                             <option value=""></option>
                             {% for team_name in teams %}
                                 <option value="{{ team_name }}">{{ team_name }}</option>
@@ -38,13 +40,13 @@
                     </td>
                 {% elif key == 'Bible' and value in ['1', '2', '3', '4', '5'] %}
                     <td>
-                        <select class="quizzer-select" name="quizzer_{{ loop.parent.loop.index }}_{{ loop.index }}">
+                        <select class="quizzer-select" name="quizzer_{{ team_index }}_{{ loop.index }}">
                             <option value=""></option>
                         </select>
                     </td>
                 {% elif key.isdigit() and 1 <= key|int <= 20 %}
                     <td>
-                        <select name="score_{{ loop.parent.loop.index }}_{{ loop.index }}">
+                        <select name="score_{{ team_index }}_{{ loop.index }}">
                             <option value=""></option>
                             <option value="C">C</option>
                             <option value="B">B</option>
