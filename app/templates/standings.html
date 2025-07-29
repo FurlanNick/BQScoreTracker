@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standings</title>
+</head>
+<body>
+    <h1>Team Standings</h1>
+    <table>
+        <tr>
+            <th>Team</th>
+            <th>Score</th>
+        </tr>
+        {% for team in team_standings %}
+        <tr>
+            <td>{{ team.name }}</td>
+            <td>{{ team.score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h1>Quizzer Standings</h1>
+    <table>
+        <tr>
+            <th>Quizzer</th>
+            <th>Score</th>
+        </tr>
+        {% for quizzer in quizzer_standings %}
+        <tr>
+            <td>{{ quizzer.name }}</td>
+            <td>{{ quizzer.score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
