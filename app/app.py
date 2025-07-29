@@ -11,6 +11,16 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def init_db():
+    conn = get_db_connection()
+    with app.app_context():
+        db = conn
+        with app.open_resource('schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.execute('INSERT INTO users (username, password, district, role) VALUES (?, ?, ?, ?)',
+                     ('Admin', 'Admin', 'All', 'Admin'))
+        db.commit()
+
 # In-memory quiz database
 quizzes = {}
 
@@ -259,4 +269,5 @@ def create_team():
     return render_template('create_team.html')
 
 if __name__ == '__main__':
+    init_db()
     app.run(host='0.0.0.0', port=8090)
