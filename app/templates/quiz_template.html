@@ -28,6 +28,7 @@
             {% for key, value in row.items() %}
                 {% if key == 'Team' and loop.parent.loop.index > 11 and loop.parent.loop.index < 14 %}
                     <td>
+                        <input type="checkbox" name="on_time_{{ loop.parent.loop.index - 11 }}" checked> On Time
                         <select name="team_{{ loop.parent.loop.index - 11 }}">
                             <option value=""></option>
                             {% for team_name in teams %}
@@ -46,7 +47,9 @@
                         <select name="score_{{ loop.parent.loop.index }}_{{ loop.index }}">
                             <option value=""></option>
                             <option value="C">C</option>
+                            <option value="B">B</option>
                             <option value="E">E</option>
+                            <option value="BE">BE</option>
                             <option value="F">F</option>
                             <option value="OUT">OUT</option>
                             <option value="IN">IN</option>
@@ -58,6 +61,24 @@
             {% endfor %}
         </tr>
         {% endfor %}
+        <tr>
+            <td>Team Score</td>
+            <td></td>
+            <td></td>
+            <td colspan="20" id="team_score_1">20</td>
+        </tr>
+         <tr>
+            <td>Team Score</td>
+            <td></td>
+            <td></td>
+            <td colspan="20" id="team_score_2">20</td>
+        </tr>
+         <tr>
+            <td>Team Score</td>
+            <td></td>
+            <td></td>
+            <td colspan="20" id="team_score_3">20</td>
+        </tr>
     </table>
 
     {% if session.username and users[session.username].role in ['Admin', 'District', 'Official'] %}
@@ -72,12 +93,104 @@
     <script>
         const teams = {{ teams | tojson }};
         const teamSelects = document.querySelectorAll('select[name^="team_"]');
+        const onTimeCheckboxes = document.querySelectorAll('input[name^="on_time_"]');
+
+        function calculateInitialScore(teamIndex) {
+            const onTimeCheckbox = document.querySelector(`input[name="on_time_${teamIndex}"]`);
+            const teamScore = document.getElementById(`team_score_${teamIndex}`);
+
+            if (onTimeCheckbox.checked) {
+                teamScore.textContent = 20;
+            } else {
+                teamScore.textContent = 0;
+            }
+        }
+
+        onTimeCheckboxes.forEach(checkbox => {
+            const teamIndex = checkbox.name.split('_')[2];
+            checkbox.addEventListener('change', () => {
+                calculateInitialScore(teamIndex);
+            });
+        });
+
+        function updateTeamScore(teamIndex) {
+            const teamScoreEl = document.getElementById(`team_score_${teamIndex}`);
+            let score = 0;
+
+            const onTimeCheckbox = document.querySelector(`input[name="on_time_${teamIndex}"]`);
+            if (onTimeCheckbox.checked) {
+                score += 20;
+            }
+
+            const quizzerScores = document.querySelectorAll(`select[name^="score_${teamIndex}_"]`);
+            let correctAnswers = 0;
+            let thirdQuizzerBonus = false;
+            let fourthQuizzerBonus = false;
+            let fifthQuizzerBonus = false;
+            let fouls = 0;
+
+            let personalErrors = {};
+            let teamErrors = 0;
+
+            quizzerScores.forEach(scoreSelect => {
+                const quizzerName = scoreSelect.parentElement.parentElement.querySelector('.quizzer-select').value;
+
+                if (scoreSelect.value === 'C') {
+                    correctAnswers++;
+                    score += 20;
+                } else if (scoreSelect.value === 'E') {
+                    teamErrors++;
+                    if (!personalErrors[quizzerName]) {
+                        personalErrors[quizzerName] = 0;
+                    }
+                    personalErrors[quizzerName]++;
+
+                    if (personalErrors[quizzerName] > 1 || teamErrors > 2) {
+                        score -= 10;
+                    }
+                } else if (scoreSelect.value === 'B') {
+                    const questionNumber = parseInt(scoreSelect.name.split('_')[2]);
+                    if (questionNumber <= 16) {
+                        score += 20;
+                    } else {
+                        score += 10;
+                    }
+                } else if (scoreSelect.value === 'F') {
+                    fouls++;
+                    if (fouls > 2) {
+                        score -= 10;
+                    }
+                }
+            });
+
+            if (correctAnswers >= 3 && !thirdQuizzerBonus) {
+                score += 10;
+                thirdQuizzerBonus = true;
+            }
+            if (correctAnswers >= 4 && !fourthQuizzerBonus) {
+                score += 10;
+                fourthQuizzerBonus = true;
+            }
+            if (correctAnswers >= 5 && !fifthQuizzerBonus) {
+                score += 10;
+                fifthQuizzerBonus = true;
+            }
+
+            teamScoreEl.textContent = score;
+        }
 
         teamSelects.forEach(select => {
             select.addEventListener('change', (event) => {
                 const teamName = event.target.value;
                 const teamIndex = event.target.name.split('_')[1];
                 const quizzerSelects = document.querySelectorAll(`.quizzer-select[name^="quizzer_${teamIndex}_"]`);
+                const scoreSelects = document.querySelectorAll(`select[name^="score_${teamIndex}_"]`);
+
+                scoreSelects.forEach(scoreSelect => {
+                    scoreSelect.addEventListener('change', () => {
+                        updateTeamScore(teamIndex);
+                    });
+                });
 
                 quizzerSelects.forEach(quizzerSelect => {
                     quizzerSelect.innerHTML = '<option value=""></option>';
