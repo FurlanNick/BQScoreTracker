@@ -76,8 +76,8 @@
             <td>
                 <select name="team_1">
                     <option value=""></option>
-                    {% for team_name in teams %}
-                        <option value="{{ team_name }}">{{ team_name }}</option>
+                    {% for team in teams %}
+                        <option value="{{ team.name }}">{{ team.name }}</option>
                     {% endfor %}
                 </select>
             </td>
@@ -151,8 +151,8 @@
             <td>
                 <select name="team_2">
                     <option value=""></option>
-                    {% for team_name in teams %}
-                        <option value="{{ team_name }}">{{ team_name }}</option>
+                    {% for team in teams %}
+                        <option value="{{ team.name }}">{{ team.name }}</option>
                     {% endfor %}
                 </select>
             </td>
@@ -226,8 +226,8 @@
             <td>
                 <select name="team_3">
                     <option value=""></option>
-                    {% for team_name in teams %}
-                        <option value="{{ team_name }}">{{ team_name }}</option>
+                    {% for team in teams %}
+                        <option value="{{ team.name }}">{{ team.name }}</option>
                     {% endfor %}
                 </select>
             </td>
@@ -433,17 +433,19 @@
                 const teamName = event.target.value;
                 const quizzerSelects = document.querySelectorAll(`.quizzer-select[name^="quizzer_${teamIndex}_"]`);
 
-                quizzerSelects.forEach(quizzerSelect => {
-                    quizzerSelect.innerHTML = '<option value=""></option>';
-                    if (teamName && teams[teamName]) {
-                        teams[teamName].quizzers.forEach(quizzer => {
-                            const option = document.createElement('option');
-                            option.value = quizzer;
-                            option.textContent = quizzer;
-                            quizzerSelect.appendChild(option);
+                fetch(`/get_quizzers/${teamName}`)
+                    .then(response => response.json())
+                    .then(quizzers => {
+                        quizzerSelects.forEach(quizzerSelect => {
+                            quizzerSelect.innerHTML = '<option value=""></option>';
+                            quizzers.forEach(quizzer => {
+                                const option = document.createElement('option');
+                                option.value = quizzer.name;
+                                option.textContent = quizzer.name;
+                                quizzerSelect.appendChild(option);
+                            });
                         });
-                    }
-                });
+                    });
                 updateTeamScore(teamIndex);
             });
         });

@@ -277,6 +277,14 @@ def create_team():
 
     return render_template('create_team.html')
 
+@app.route('/get_quizzers/<team_name>')
+def get_quizzers(team_name):
+    conn = get_db_connection()
+    team = conn.execute('SELECT * FROM teams WHERE name = ?', (team_name,)).fetchone()
+    quizzers = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team['id'],)).fetchall()
+    conn.close()
+    return json.dumps([dict(row) for row in quizzers])
+
 if __name__ == '__main__':
     init_db()
     app.run(host='0.0.0.0', port=8090)
