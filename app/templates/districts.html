@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Districts</title>
+</head>
+<body>
+    <h1>Districts</h1>
+    <table>
+        <tr>
+            <th>Name</th>
+        </tr>
+        {% for district in districts %}
+        <tr>
+            <td>{{ district.name }}</td>
+            <td><a href="/edit_district/{{ district.id }}">Edit</a></td>
+            <td><a href="/delete_district/{{ district.id }}">Delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Add New District</h2>
+    <form action="/add_district" method="post">
+        <label for="new_district">District Name:</label><br>
+        <input type="text" id="new_district" name="new_district" required><br><br>
+        <input type="submit" value="Add District">
+    </form>
+</body>
+</html>

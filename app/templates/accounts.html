@@ -13,11 +13,13 @@
             <th>District</th>
             <th>Role</th>
         </tr>
-        {% for username, user_data in users.items() %}
+        {% for user in users %}
         <tr>
-            <td>{{ username }}</td>
-            <td>{{ user_data.district }}</td>
-            <td>{{ user_data.role }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.district }}</td>
+            <td>{{ user.role }}</td>
+            <td><a href="/edit_user/{{ user.id }}">Edit</a></td>
+            <td><a href="/delete_user/{{ user.id }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -39,7 +41,7 @@
         <label for="district">District:</label><br>
         <select id="district" name="district">
             {% for district in districts %}
-            <option value="{{ district }}">{{ district }}</option>
+            <option value="{{ district.name }}">{{ district.name }}</option>
             {% endfor %}
         </select><br><br>
         <input type="submit" value="Add User">

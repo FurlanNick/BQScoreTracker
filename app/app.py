@@ -1,27 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import json
 
+import sqlite3
+
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'  # This should be a random, secret value
 
-# In-memory user database
-users = {
-    'Admin': {'password': 'Admin', 'district': 'All', 'role': 'Admin'}
-}
-
-districts = [
-    "Eastern Canadian District",
-    "Central Canadian District",
-    "Canadian Midwest District",
-    "Western Canadian District",
-    "Great Lakes District",
-    "Western Great Lakes District",
-    "Central District",
-    "Ohio Valley District"
-]
-
-# In-memory team database
-teams = {}
+def get_db_connection():
+    conn = sqlite3.connect('../database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 # In-memory quiz database
 quizzes = {}
@@ -74,8 +62,13 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username in users and users[username]['password'] == password:
-            session['username'] = username
+
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+        conn.close()
+
+        if user and user['password'] == password:
+            session['username'] = user['username']
             return redirect(url_for('competition'))
         else:
             error = 'Invalid Credentials. Please try again.'
@@ -109,11 +102,18 @@ def quiz_list(meet_number, room_number):
 
 @app.route('/quiz/<quiz_name>')
 def quiz(quiz_name):
+    conn = get_db_connection()
+    teams = conn.execute('SELECT * FROM teams').fetchall()
+    conn.close()
     return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams)
 
 @app.route('/accounts')
 @role_required('Admin')
 def accounts():
+    conn = get_db_connection()
+    users = conn.execute('SELECT * FROM users').fetchall()
+    districts = conn.execute('SELECT * FROM districts').fetchall()
+    conn.close()
     return render_template('accounts.html', users=users, districts=districts)
 
 @app.route('/add_user', methods=['POST'])
@@ -124,17 +124,81 @@ def add_user():
     role = request.form['role']
     district = request.form['district']
 
-    if username not in users:
-        users[username] = {'password': password, 'district': district, 'role': role}
+    conn = get_db_connection()
+    conn.execute('INSERT INTO users (username, password, district, role) VALUES (?, ?, ?, ?)',
+                 (username, password, district, role))
+    conn.commit()
+    conn.close()
 
+    return redirect(url_for('accounts'))
+
+@app.route('/edit_user/<int:user_id>', methods=['GET', 'POST'])
+@role_required('Admin')
+def edit_user(user_id):
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+        district = request.form['district']
+
+        conn.execute('UPDATE users SET username = ?, password = ?, role = ?, district = ? WHERE id = ?',
+                     (username, password, role, district, user_id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('accounts'))
+
+    districts = conn.execute('SELECT * FROM districts').fetchall()
+    conn.close()
+    return render_template('edit_user.html', user=user, districts=districts)
+
+@app.route('/delete_user/<int:user_id>')
+@role_required('Admin')
+def delete_user(user_id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM users WHERE id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('accounts'))
+
+@app.route('/edit_district/<int:district_id>', methods=['GET', 'POST'])
+@role_required('Admin')
+def edit_district(district_id):
+    conn = get_db_connection()
+    district = conn.execute('SELECT * FROM districts WHERE id = ?', (district_id,)).fetchone()
+
+    if request.method == 'POST':
+        name = request.form['name']
+
+        conn.execute('UPDATE districts SET name = ? WHERE id = ?',
+                     (name, district_id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('accounts'))
+
+    conn.close()
+    return render_template('edit_district.html', district=district)
+
+@app.route('/delete_district/<int:district_id>')
+@role_required('Admin')
+def delete_district(district_id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM districts WHERE id = ?', (district_id,))
+    conn.commit()
+    conn.close()
     return redirect(url_for('accounts'))
 
 @app.route('/add_district', methods=['POST'])
 @role_required('Admin')
 def add_district():
     new_district = request.form['new_district']
-    if new_district not in districts:
-        districts.append(new_district)
+
+    conn = get_db_connection()
+    conn.execute('INSERT INTO districts (name) VALUES (?)', (new_district,))
+    conn.commit()
+    conn.close()
 
     return redirect(url_for('accounts'))
 
@@ -155,8 +219,16 @@ def create_team():
         coaches = request.form.getlist('coaches')
         quizzers = request.form.getlist('quizzers')
 
-        if team_name not in teams:
-            teams[team_name] = {'coaches': coaches, 'quizzers': quizzers}
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('INSERT INTO teams (name, district) VALUES (?, ?)', (team_name, ''))
+        team_id = cur.lastrowid
+
+        for quizzer_name in quizzers:
+            conn.execute('INSERT INTO quizzers (name, team_id) VALUES (?, ?)', (quizzer_name, team_id))
+
+        conn.commit()
+        conn.close()
 
         return redirect(url_for('competition'))
 
