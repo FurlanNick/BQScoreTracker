@@ -33,11 +33,6 @@ def role_required(required_role):
             if 'username' not in session:
                 return redirect(url_for('login'))
 
-            conn = get_db_connection()
-            user = conn.execute('SELECT * FROM users WHERE username = ?', (session['username'],)).fetchone()
-            conn.close()
-
-            if user['role'] != required_role and user['role'] != 'Admin':
                 return redirect(url_for('competition'))
 
             return f(*args, **kwargs)
