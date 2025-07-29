@@ -33,8 +33,6 @@ def role_required(required_role):
             if 'username' not in session:
                 return redirect(url_for('login'))
 
-            user_role = users[session['username']]['role']
-            if user_role != required_role and user_role != 'Admin':
                 return redirect(url_for('competition'))
 
             return f(*args, **kwargs)
