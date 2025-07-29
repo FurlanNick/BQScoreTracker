@@ -146,7 +146,7 @@ def quiz(quiz_name):
     conn = get_db_connection()
     teams_from_db = conn.execute('SELECT * FROM teams').fetchall()
     teams = [dict(row) for row in teams_from_db]
-    users = conn.execute('SELECT * FROM users').fetchall()
+    users_from_db = conn.execute('SELECT * FROM users').fetchall()
     users = [dict(row) for row in users_from_db]
     conn.close()
     return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams)
