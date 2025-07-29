@@ -11,6 +11,9 @@
             padding: 5px;
             text-align: center;
         }
+        .question-col {
+            width: 30px;
+        }
     </style>
 </head>
 <body>
@@ -102,7 +105,7 @@
                 </select>
             </td>
             {% for j in range(1, 27) %}
-            <td>
+            <td class="question-col">
                 <select name="score_1_{{ i }}_{{ j }}">
                     <option value=""></option>
                     <option value="C">C</option>
@@ -120,7 +123,7 @@
         <tr>
             <td colspan="2">Score</td>
             {% for i in range(1, 27) %}
-            <td>20</td>
+            <td id="running_total_1_{{ i }}">20</td>
             {% endfor %}
         </tr>
         <tr>
@@ -177,7 +180,7 @@
                 </select>
             </td>
             {% for j in range(1, 27) %}
-            <td>
+            <td class="question-col">
                 <select name="score_2_{{ i }}_{{ j }}">
                     <option value=""></option>
                     <option value="C">C</option>
@@ -195,7 +198,7 @@
         <tr>
             <td colspan="2">Score</td>
             {% for i in range(1, 27) %}
-            <td>20</td>
+            <td id="running_total_2_{{ i }}">20</td>
             {% endfor %}
         </tr>
         <tr>
@@ -252,7 +255,7 @@
                 </select>
             </td>
             {% for j in range(1, 27) %}
-            <td>
+            <td class="question-col">
                 <select name="score_3_{{ i }}_{{ j }}">
                     <option value=""></option>
                     <option value="C">C</option>
@@ -270,7 +273,7 @@
         <tr>
             <td colspan="2">Score</td>
             {% for i in range(1, 27) %}
-            <td>20</td>
+            <td id="running_total_3_{{ i }}">20</td>
             {% endfor %}
         </tr>
         <tr>
@@ -388,6 +391,39 @@
             }
 
             teamScoreEl.textContent = score;
+
+            let runningTotal = 0;
+            const onTimeCheckbox = document.querySelector(`input[name="on_time_${teamIndex}"]`);
+            if (onTimeCheckbox.checked) {
+                runningTotal = 20;
+            }
+
+            for (let i = 1; i <= 26; i++) {
+                const scoreSelectsInQuestion = document.querySelectorAll(`select[name^="score_${teamIndex}_"][name$="_${i}"], select[name^="score_${teamIndex}_"][name$="_${i}b"]`);
+                scoreSelectsInQuestion.forEach(scoreSelect => {
+                    if (scoreSelect.value === 'C') {
+                        runningTotal += 20;
+                    } else if (scoreSelect.value === 'E') {
+                        // This logic needs to be improved to handle team and personal errors correctly
+                        runningTotal -= 10;
+                    } else if (scoreSelect.value === 'B') {
+                        const questionNumberString = scoreSelect.name.split('_')[3];
+                        const questionNumber = parseInt(questionNumberString);
+                        if (questionNumber <= 16) {
+                            runningTotal += 20;
+                        } else {
+                            runningTotal += 10;
+                        }
+                    } else if (scoreSelect.value === 'F') {
+                        // This logic needs to be improved to handle fouls correctly
+                        runningTotal -= 10;
+                    }
+                });
+                const runningTotalEl = document.getElementById(`running_total_${teamIndex}_${i}`);
+                if(runningTotalEl) {
+                    runningTotalEl.textContent = runningTotal;
+                }
+            }
         }
 
         const teamSelects = document.querySelectorAll('select[name^="team_"]');

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+</head>
+<body>
+    <h1>Edit User</h1>
+    <form method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" value="{{ user.username }}" required><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" value="{{ user.password }}" required><br>
+        <label for="role">Role:</label><br>
+        <select id="role" name="role">
+            <option value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Admin</option>
+            <option value="District" {% if user.role == 'District' %}selected{% endif %}>District</option>
+            <option value="Official" {% if user.role == 'Official' %}selected{% endif %}>Official</option>
+            <option value="Coach" {% if user.role == 'Coach' %}selected{% endif %}>Coach</option>
+            <option value="Spectator" {% if user.role == 'Spectator' %}selected{% endif %}>Spectator</option>
+        </select><br>
+        <label for="district">District:</label><br>
+        <select id="district" name="district">
+            {% for district in districts %}
+            <option value="{{ district.name }}" {% if user.district == district.name %}selected{% endif %}>{{ district.name }}</option>
+            {% endfor %}
+        </select><br><br>
+        <input type="submit" value="Update User">
+    </form>
+</body>
+</html>
