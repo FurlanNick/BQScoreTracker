@@ -109,8 +109,7 @@ def quiz_list(meet_number, room_number):
 
 @app.route('/quiz/<quiz_name>')
 def quiz(quiz_name):
-    quiz_data = parse_quiz_template()
-    return render_template('quiz_template.html', quiz_name=quiz_name, quiz_data=quiz_data, users=users, teams=teams)
+    return render_template('new_quiz_template.html', quiz_name=quiz_name, users=users, teams=teams)
 
 @app.route('/accounts')
 @role_required('Admin')
