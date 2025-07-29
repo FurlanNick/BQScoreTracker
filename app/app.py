@@ -45,8 +45,33 @@ def calculate_team_standings(quizzes):
     return standings
 
 def calculate_quizzer_standings(quizzes):
-    # This is a placeholder for the actual scoring logic
-    return []
+    quizzer_scores = {}
+    for quiz_name, quiz_data in quizzes.items():
+        for team_index in range(1, 4):
+            for i in range(1, 6):
+                quizzer_name = quiz_data.get(f'quizzer_{team_index}_{i}')
+                if quizzer_name:
+                    if quizzer_name not in quizzer_scores:
+                        quizzer_scores[quizzer_name] = {'score': 0, 'correct': 0, 'errors': 0}
+
+                    for j in range(1, 27):
+                        score = quiz_data.get(f'score_{team_index}_{i}_{j}')
+                        if score == 'C':
+                            quizzer_scores[quizzer_name]['score'] += 20
+                            quizzer_scores[quizzer_name]['correct'] += 1
+                        elif score == 'E':
+                            quizzer_scores[quizzer_name]['errors'] += 1
+
+    for quizzer_name, data in quizzer_scores.items():
+        if data['correct'] >= 4 and data['errors'] == 0:
+            data['score'] += 10
+
+        if data['errors'] > 1:
+            data['score'] -= (data['errors'] -1) * 10
+
+    standings = [{'name': name, 'score': data['score']} for name, data in quizzer_scores.items()]
+    standings.sort(key=lambda x: x['score'], reverse=True)
+    return standings
 
 def parse_quiz_template():
     with open('../template.json', 'r') as f:
@@ -207,8 +232,7 @@ def edit_quiz(quiz_name):
     if 'username' not in session or users[session['username']]['role'] not in ['Admin', 'District', 'Official']:
         return redirect(url_for('login'))
 
-    score = request.form['score']
-    print(f"Quiz {quiz_name} score updated to: {score}")
+    quizzes[quiz_name] = request.form
 
     return redirect(url_for('quiz', quiz_name=quiz_name))
 
