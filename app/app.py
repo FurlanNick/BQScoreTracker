@@ -114,8 +114,11 @@ def competition():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    district = users[session['username']]['district']
-    return render_template('competition.html', district=district)
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE username = ?', (session['username'],)).fetchone()
+    conn.close()
+
+    return render_template('competition.html', district=user['district'])
 
 @app.route('/standings')
 def standings():
