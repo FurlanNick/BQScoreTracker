@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoresheet</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+            text-align: center;
+        }
+        .question-col {
+            width: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scoresheet</h1>
+    <table>
+        <!-- Header Row -->
+        <tr>
+            <td colspan="2">Bible Quizzing Score Sheet</td>
+            <td>DATE:</td>
+            <td colspan="2"></td>
+            <td>QUIZ #:</td>
+            <td colspan="2"></td>
+            <td>ROOM #:</td>
+            <td colspan="2"></td>
+            <td colspan="15"></td>
+            <td colspan="3">Team</td>
+            <td colspan="2">Score</td>
+            <td colspan="2">Points</td>
+        </tr>
+        <tr>
+            <td colspan="2">CMA</td>
+            <td>QUIZMASTER:</td>
+            <td colspan="2"></td>
+            <td>SCOREKEEPER:</td>
+            <td colspan="2"></td>
+            <td>ANSWER JUDGE:</td>
+            <td colspan="2"></td>
+            <td colspan="15"></td>
+            <td>First</td>
+            <td colspan="2"></td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td colspan="12"></td>
+            <td colspan="15"></td>
+            <td>Second</td>
+            <td colspan="2"></td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td colspan="12"></td>
+            <td colspan="15"></td>
+            <td>Third</td>
+            <td colspan="2"></td>
+            <td colspan="2"></td>
+        </tr>
+
+        <!--Spacer Row-->
+        <tr><td colspan="32" style="border: none;"></td></tr>
+
+        <!-- Team 1 -->
+        <tr>
+            <td rowspan="2">Captain</td>
+            <td>Team</td>
+            <td colspan="15"></td>
+            <td colspan="4">ERROR POINTS IN EFFECT</td>
+            <td colspan="6">OVERTIME</td>
+        </tr>
+        <tr>
+            <td>
+                <select name="team_1">
+                    <option value=""></option>
+                    {% for team_name in teams %}
+                        <option value="{{ team_name }}">{{ team_name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            {% for i in range(1, 16) %}
+            <td>{{ i }}</td>
+            {% endfor %}
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+            <td>21</td>
+            <td>22</td>
+            <td>23</td>
+            <td>24</td>
+            <td>25</td>
+            <td>26</td>
+        </tr>
+        {% for i in range(1, 6) %}
+        <tr>
+            <td>{{ i }}</td>
+            <td>
+                <select class="quizzer-select" name="quizzer_1_{{ i }}">
+                    <option value=""></option>
+                </select>
+            </td>
+            {% for j in range(1, 27) %}
+            <td class="question-col">
+                <select name="score_1_{{ i }}_{{ j }}">
+                    <option value=""></option>
+                    <option value="C">C</option>
+                    <option value="B">B</option>
+                    <option value="E">E</option>
+                    <option value="BE">BE</option>
+                    <option value="F">F</option>
+                    <option value="OUT">OUT</option>
+                    <option value="IN">IN</option>
+                </select>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="2">Score</td>
+            {% for i in range(1, 27) %}
+            <td id="running_total_1_{{ i }}">20</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td colspan="2">Appeal</td>
+            <td colspan="15"></td>
+            <td colspan="11"></td>
+        </tr>
+        <tr>
+            <td colspan="2">Timeouts</td>
+            <td colspan="30"></td>
+        </tr>
+
+        <!--Spacer Row-->
+        <tr><td colspan="32" style="border: none;"></td></tr>
+
+        <!-- Team 2 -->
+        <tr>
+            <td rowspan="2">Captain</td>
+            <td>Team</td>
+            <td colspan="15"></td>
+            <td colspan="4">ERROR POINTS IN EFFECT</td>
+            <td colspan="6">OVERTIME</td>
+        </tr>
+        <tr>
+            <td>
+                <select name="team_2">
+                    <option value=""></option>
+                    {% for team_name in teams %}
+                        <option value="{{ team_name }}">{{ team_name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            {% for i in range(1, 16) %}
+            <td>{{ i }}</td>
+            {% endfor %}
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+            <td>21</td>
+            <td>22</td>
+            <td>23</td>
+            <td>24</td>
+            <td>25</td>
+            <td>26</td>
+        </tr>
+        {% for i in range(1, 6) %}
+        <tr>
+            <td>{{ i }}</td>
+            <td>
+                <select class="quizzer-select" name="quizzer_2_{{ i }}">
+                    <option value=""></option>
+                </select>
+            </td>
+            {% for j in range(1, 27) %}
+            <td class="question-col">
+                <select name="score_2_{{ i }}_{{ j }}">
+                    <option value=""></option>
+                    <option value="C">C</option>
+                    <option value="B">B</option>
+                    <option value="E">E</option>
+                    <option value="BE">BE</option>
+                    <option value="F">F</option>
+                    <option value="OUT">OUT</option>
+                    <option value="IN">IN</option>
+                </select>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="2">Score</td>
+            {% for i in range(1, 27) %}
+            <td id="running_total_2_{{ i }}">20</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td colspan="2">Appeal</td>
+            <td colspan="15"></td>
+            <td colspan="11"></td>
+        </tr>
+        <tr>
+            <td colspan="2">Timeouts</td>
+            <td colspan="30"></td>
+        </tr>
+
+        <!--Spacer Row-->
+        <tr><td colspan="32" style="border: none;"></td></tr>
+
+        <!-- Team 3 -->
+        <tr>
+            <td rowspan="2">Captain</td>
+            <td>Team</td>
+            <td colspan="15"></td>
+            <td colspan="4">ERROR POINTS IN EFFECT</td>
+            <td colspan="6">OVERTIME</td>
+        </tr>
+        <tr>
+            <td>
+                <select name="team_3">
+                    <option value=""></option>
+                    {% for team_name in teams %}
+                        <option value="{{ team_name }}">{{ team_name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            {% for i in range(1, 16) %}
+            <td>{{ i }}</td>
+            {% endfor %}
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+            <td>21</td>
+            <td>22</td>
+            <td>23</td>
+            <td>24</td>
+            <td>25</td>
+            <td>26</td>
+        </tr>
+        {% for i in range(1, 6) %}
+        <tr>
+            <td>{{ i }}</td>
+            <td>
+                <select class="quizzer-select" name="quizzer_3_{{ i }}">
+                    <option value=""></option>
+                </select>
+            </td>
+            {% for j in range(1, 27) %}
+            <td class="question-col">
+                <select name="score_3_{{ i }}_{{ j }}">
+                    <option value=""></option>
+                    <option value="C">C</option>
+                    <option value="B">B</option>
+                    <option value="E">E</option>
+                    <option value="BE">BE</option>
+                    <option value="F">F</option>
+                    <option value="OUT">OUT</option>
+                    <option value="IN">IN</option>
+                </select>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="2">Score</td>
+            {% for i in range(1, 27) %}
+            <td id="running_total_3_{{ i }}">20</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td colspan="2">Appeal</td>
+            <td colspan="15"></td>
+            <td colspan="11"></td>
+        </tr>
+        <tr>
+            <td colspan="2">Timeouts</td>
+            <td colspan="30"></td>
+        </tr>
+
+        <!--Spacer Row-->
+        <tr><td colspan="32" style="border: none;"></td></tr>
+
+        <!-- Scoring Rules -->
+        <tr>
+            <td colspan="16">SCORING RULES:</td>
+            <td colspan="16">TOURNAMENT SCORING</td>
+        </tr>
+        <tr>
+            <td colspan="8">C = Correct Answer</td>
+            <td colspan="8">E = error</td>
+            <td colspan="16" rowspan="4"></td>
+        </tr>
+        <tr>
+            <td colspan="8">B = Correct Bonus Answer</td>
+            <td colspan="8">BE = bonus error, no points lost</td>
+        </tr>
+        <tr>
+            <td colspan="8"></td>
+            <td colspan="8">F = foul</td>
+        </tr>
+        <tr>
+            <td colspan="8"></td>
+            <td colspan="8">A = Overruled Appeal</td>
+        </tr>
+        <tr>
+            <td colspan="8"></td>
+            <td colspan="8"><> = Quizzer Entering Quiz</td>
+        </tr>
+        <tr>
+            <td colspan="8"></td>
+            <td colspan="8">< = Quizzer Leaving Quiz</td>
+        </tr>
+
+
+    </table>
+
+    <script>
+        const teams = {{ teams | tojson }};
+
+        function updateTeamScore(teamIndex) {
+            const teamScoreEl = document.getElementById(`team_score_${teamIndex}`);
+            let score = 0;
+
+            const onTimeCheckbox = document.querySelector(`input[name="on_time_${teamIndex}"]`);
+            if (onTimeCheckbox.checked) {
+                score += 20;
+            }
+
+            const scoreSelects = document.querySelectorAll(`select[name^="score_${teamIndex}_"]`);
+            let correctQuizzers = new Set();
+            let personalErrors = {};
+            let teamErrors = 0;
+            let fouls = 0;
+
+            scoreSelects.forEach(scoreSelect => {
+                const quizzerSelect = scoreSelect.parentElement.previousElementSibling.querySelector('.quizzer-select');
+                const quizzerName = quizzerSelect.value;
+
+                if (scoreSelect.value === 'C') {
+                    score += 20;
+                    if (quizzerName) {
+                        correctQuizzers.add(quizzerName);
+                    }
+                } else if (scoreSelect.value === 'E') {
+                    teamErrors++;
+                    if (quizzerName) {
+                        if (!personalErrors[quizzerName]) {
+                            personalErrors[quizzerName] = 0;
+                        }
+                        personalErrors[quizzerName]++;
+                        if (personalErrors[quizzerName] > 1) {
+                            score -= 10;
+                        }
+                    }
+                    if (teamErrors > 2) {
+                        score -= 10;
+                    }
+                } else if (scoreSelect.value === 'B') {
+                    const questionNumberString = scoreSelect.name.split('_')[3];
+                    const questionNumber = parseInt(questionNumberString);
+                    if (questionNumber <= 16) {
+                        score += 20;
+                    } else {
+                        score += 10;
+                    }
+                } else if (scoreSelect.value === 'F') {
+                    fouls++;
+                    if (fouls > 2) {
+                        score -= 10;
+                    }
+                }
+            });
+
+            if (correctQuizzers.size >= 3) {
+                score += 10;
+            }
+            if (correctQuizzers.size >= 4) {
+                score += 10;
+            }
+            if (correctQuizzers.size >= 5) {
+                score += 10;
+            }
+
+            teamScoreEl.textContent = score;
+
+            let runningTotal = 0;
+            const onTimeCheckbox = document.querySelector(`input[name="on_time_${teamIndex}"]`);
+            if (onTimeCheckbox.checked) {
+                runningTotal = 20;
+            }
+
+            for (let i = 1; i <= 26; i++) {
+                const scoreSelectsInQuestion = document.querySelectorAll(`select[name^="score_${teamIndex}_"][name$="_${i}"], select[name^="score_${teamIndex}_"][name$="_${i}b"]`);
+                scoreSelectsInQuestion.forEach(scoreSelect => {
+                    if (scoreSelect.value === 'C') {
+                        runningTotal += 20;
+                    } else if (scoreSelect.value === 'E') {
+                        // This logic needs to be improved to handle team and personal errors correctly
+                        runningTotal -= 10;
+                    } else if (scoreSelect.value === 'B') {
+                        const questionNumberString = scoreSelect.name.split('_')[3];
+                        const questionNumber = parseInt(questionNumberString);
+                        if (questionNumber <= 16) {
+                            runningTotal += 20;
+                        } else {
+                            runningTotal += 10;
+                        }
+                    } else if (scoreSelect.value === 'F') {
+                        // This logic needs to be improved to handle fouls correctly
+                        runningTotal -= 10;
+                    }
+                });
+                const runningTotalEl = document.getElementById(`running_total_${teamIndex}_${i}`);
+                if(runningTotalEl) {
+                    runningTotalEl.textContent = runningTotal;
+                }
+            }
+        }
+
+        const teamSelects = document.querySelectorAll('select[name^="team_"]');
+        teamSelects.forEach((select, index) => {
+            const teamIndex = index + 1;
+            select.addEventListener('change', (event) => {
+                const teamName = event.target.value;
+                const quizzerSelects = document.querySelectorAll(`.quizzer-select[name^="quizzer_${teamIndex}_"]`);
+
+                quizzerSelects.forEach(quizzerSelect => {
+                    quizzerSelect.innerHTML = '<option value=""></option>';
+                    if (teamName && teams[teamName]) {
+                        teams[teamName].quizzers.forEach(quizzer => {
+                            const option = document.createElement('option');
+                            option.value = quizzer;
+                            option.textContent = quizzer;
+                            quizzerSelect.appendChild(option);
+                        });
+                    }
+                });
+                updateTeamScore(teamIndex);
+            });
+        });
+
+        const onTimeCheckboxes = document.querySelectorAll('input[name^="on_time_"]');
+        onTimeCheckboxes.forEach((checkbox, index) => {
+            const teamIndex = index + 1;
+            checkbox.addEventListener('change', () => {
+                updateTeamScore(teamIndex);
+            });
+        });
+
+        const scoreSelects = document.querySelectorAll('select[name^="score_"]');
+        scoreSelects.forEach(select => {
+            const teamIndex = select.name.split('_')[1];
+            select.addEventListener('change', () => {
+                updateTeamScore(teamIndex);
+            });
+        });
+    </script>
+</body>
+</html>
