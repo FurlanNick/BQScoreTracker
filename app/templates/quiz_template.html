@@ -11,25 +11,50 @@
         }
         th, td {
             padding: 5px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
     <h1>Quiz {{ quiz_name }}</h1>
 
-    <label for="team">Select Team:</label>
-    <select id="team" name="team">
-        {% for team_name in teams %}
-        <option value="{{ team_name }}">{{ team_name }}</option>
-        {% endfor %}
-    </select>
-    <br><br>
 
     <table>
         {% for row in quiz_data %}
         <tr>
             {% for key, value in row.items() %}
-            <td>{{ value }}</td>
+                {% if key == 'Team' and loop.parent.loop.index > 11 and loop.parent.loop.index < 14 %}
+                    <td>
+                        <select name="team_{{ loop.parent.loop.index - 11 }}">
+                            <option value=""></option>
+                            {% for team_name in teams %}
+                                <option value="{{ team_name }}">{{ team_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                {% elif key == 'Bible' and value in ['1', '2', '3', '4', '5'] %}
+                    <td>
+                        <select class="quizzer-select" name="quizzer_{{ loop.parent.loop.index }}_{{ loop.index }}">
+                            <option value=""></option>
+                        </select>
+                    </td>
+                {% elif key.isdigit() and 1 <= key|int <= 20 %}
+                    <td>
+                        <select name="score_{{ loop.parent.loop.index }}_{{ loop.index }}">
+                            <option value=""></option>
+                            <option value="C">C</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                            <option value="OUT">OUT</option>
+                            <option value="IN">IN</option>
+                        </select>
+                    </td>
+                {% else %}
+                    <td>{{ value }}</td>
+                {% endif %}
             {% endfor %}
         </tr>
         {% endfor %}
@@ -43,5 +68,30 @@
         <input type="submit" value="Update Score">
     </form>
     {% endif %}
+
+    <script>
+        const teams = {{ teams | tojson }};
+        const teamSelects = document.querySelectorAll('select[name^="team_"]');
+
+        teamSelects.forEach(select => {
+            select.addEventListener('change', (event) => {
+                const teamName = event.target.value;
+                const teamIndex = event.target.name.split('_')[1];
+                const quizzerSelects = document.querySelectorAll(`.quizzer-select[name^="quizzer_${teamIndex}_"]`);
+
+                quizzerSelects.forEach(quizzerSelect => {
+                    quizzerSelect.innerHTML = '<option value=""></option>';
+                    if (teamName && teams[teamName]) {
+                        teams[teamName].quizzers.forEach(quizzer => {
+                            const option = document.createElement('option');
+                            option.value = quizzer;
+                            option.textContent = quizzer;
+                            quizzerSelect.appendChild(option);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
