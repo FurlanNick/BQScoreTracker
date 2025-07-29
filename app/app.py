@@ -41,7 +41,7 @@ def role_required(required_role):
     return decorator
 
 def parse_quiz_template():
-    with open('template.json', 'r') as f:
+    with open('../template.json', 'r') as f:
         return json.load(f)
 
 @app.route('/')
