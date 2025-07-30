@@ -435,7 +435,8 @@
             const teamIndex = index + 1;
             select.addEventListener('change', (event) => {
                 const teamName = event.target.value;
-                const quizzerSelects = event.target.closest('tr').nextElementSibling.querySelectorAll(`.quizzer-select`);
+                alert(`Team selected: ${teamName}`);
+                const quizzerSelects = document.querySelectorAll(`.quizzer-select[name^="quizzer_${teamIndex}_"]`);
 
                 fetch(`/get_quizzers/${teamName}`)
                     .then(response => response.json())
