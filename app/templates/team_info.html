@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Info</title>
+</head>
+<body>
+    <h1>Team Info</h1>
+    <table>
+        <tr>
+            <th>Team Name</th>
+            <th>Coaches</th>
+            <th>Quizzers</th>
+        </tr>
+        {% for team in teams %}
+        <tr>
+            <td>{{ team.name }}</td>
+            <td>
+                <ul>
+                    {% for coach in team.coaches %}
+                    <li>{{ coach }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    {% for quizzer in team.quizzers %}
+                    <li>{{ quizzer }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

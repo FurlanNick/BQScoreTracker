@@ -324,7 +324,11 @@
     </table>
 
     <script>
-        const teams = {{ teams | tojson }};
+        const teamsData = {{ teams | tojson }};
+        const teams = {};
+        teamsData.forEach(team => {
+            teams[team.name] = team;
+        });
 
         function updateTeamScore(teamIndex) {
             const teamScoreEl = document.getElementById(`team_score_${teamIndex}`);

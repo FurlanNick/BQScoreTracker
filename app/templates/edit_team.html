@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Team</title>
+</head>
+<body>
+    <h1>Edit Team</h1>
+    <form method="post">
+        <label for="team_name">Team Name:</label><br>
+        <input type="text" id="team_name" name="team_name" value="{{ team.name }}" required><br><br>
+
+        <div id="coaches">
+            {% for coach in team.coaches %}
+            <div>
+                <label for="coach{{ loop.index }}">Coach ({{ loop.index }}):</label><br>
+                <input type="text" id="coach{{ loop.index }}" name="coaches" value="{{ coach }}"><br><br>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" onclick="addCoach()">+ Add Coach</button><br><br>
+
+        <div id="quizzers">
+            {% for quizzer in team.quizzers %}
+            <div>
+                <label for="quizzer{{ loop.index }}">Quizzer ({{ loop.index }}):</label><br>
+                <input type="text" id="quizzer{{ loop.index }}" name="quizzers" value="{{ quizzer }}"><br><br>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" onclick="addQuizzer()">+ Add Quizzer</button><br><br>
+
+        <input type="submit" value="Update Team">
+    </form>
+    <br>
+    <form action="/delete_team/{{ team.id }}" method="post">
+        <input type="submit" value="Delete Team" onclick="return confirm('Are you sure you want to delete this team?');">
+    </form>
+
+    <script>
+        let coachCount = {{ team.coaches|length }};
+        function addCoach() {
+            if (coachCount < 2) {
+                coachCount++;
+                const newCoach = document.createElement('div');
+                newCoach.innerHTML = `
+                    <label for="coach${coachCount}">Coach (${coachCount}):</label><br>
+                    <input type="text" id="coach${coachCount}" name="coaches"><br><br>
+                `;
+                document.getElementById('coaches').appendChild(newCoach);
+            }
+        }
+
+        let quizzerCount = {{ team.quizzers|length }};
+        function addQuizzer() {
+            if (quizzerCount < 5) {
+                quizzerCount++;
+                const newQuizzer = document.createElement('div');
+                newQuizzer.innerHTML = `
+                    <label for="quizzer${quizzerCount}">Quizzer (${quizzerCount}):</label><br>
+                    <input type="text" id="quizzer${quizzerCount}" name="quizzers"><br><br>
+                `;
+                document.getElementById('quizzers').appendChild(newQuizzer);
+            }
+        }
+    </script>
+</body>
+</html>
