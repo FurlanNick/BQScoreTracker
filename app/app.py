@@ -262,6 +262,8 @@ def create_team():
         coaches = request.form.getlist('coaches')
         quizzers = request.form.getlist('quizzers')
 
+        print(f"Adding team: {team_name}, Coaches: {coaches}, Quizzers: {quizzers}")
+
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('INSERT INTO teams (name, district) VALUES (?, ?)', (team_name, ''))
