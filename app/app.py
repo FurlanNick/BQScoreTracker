@@ -168,8 +168,14 @@ def quiz(quiz_name):
     teams = [dict(row) for row in teams_from_db]
     users_from_db = conn.execute('SELECT * FROM users').fetchall()
     users = [dict(row) for row in users_from_db]
+
+    scoresheet_data = conn.execute('SELECT data FROM scoresheets WHERE quiz_name = ?', (quiz_name,)).fetchone()
     conn.close()
-    return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams)
+
+    if scoresheet_data:
+        scoresheet_data = json.loads(scoresheet_data['data'])
+
+    return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams, scoresheet_data=scoresheet_data)
 
 @app.route('/accounts')
 @role_required('Admin')
@@ -268,10 +274,15 @@ def add_district():
 
 @app.route('/edit_quiz/<quiz_name>', methods=['POST'])
 def edit_quiz(quiz_name):
-    if 'username' not in session or users[session['username']]['role'] not in ['Admin', 'District', 'Official']:
+    if 'username' not in session:
         return redirect(url_for('login'))
 
-    quizzes[quiz_name] = request.form
+    data = json.dumps(request.form)
+
+    conn = get_db_connection()
+    conn.execute('INSERT OR REPLACE INTO scoresheets (quiz_name, data) VALUES (?, ?)', (quiz_name, data))
+    conn.commit()
+    conn.close()
 
     return redirect(url_for('quiz', quiz_name=quiz_name))
 

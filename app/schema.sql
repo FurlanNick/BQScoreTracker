@@ -28,3 +28,9 @@ CREATE TABLE districts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL
 );
+
+CREATE TABLE scoresheets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quiz_name TEXT NOT NULL,
+    data TEXT NOT NULL
+);
