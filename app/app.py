@@ -386,14 +386,6 @@ def view_db():
     conn.close()
     return json.dumps({'teams': [dict(row) for row in teams], 'quizzers': [dict(row) for row in quizzers]})
 
-@app.route('/test_dropdowns')
-def test_dropdowns():
-    conn = get_db_connection()
-    teams_from_db = conn.execute('SELECT * FROM teams').fetchall()
-    teams = [dict(row) for row in teams_from_db]
-    conn.close()
-    return render_template('test_dropdowns.html', teams=teams)
-
 if __name__ == '__main__':
     init_db()
     app.run(host='0.0.0.0', port=8090)
