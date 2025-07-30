@@ -348,6 +348,14 @@ def delete_team(team_id):
     conn.close()
     return redirect(url_for('team_info'))
 
+@app.route('/view_db')
+def view_db():
+    conn = get_db_connection()
+    teams = conn.execute('SELECT * FROM teams').fetchall()
+    quizzers = conn.execute('SELECT * FROM quizzers').fetchall()
+    conn.close()
+    return json.dumps({'teams': [dict(row) for row in teams], 'quizzers': [dict(row) for row in quizzers]})
+
 if __name__ == '__main__':
     init_db()
     app.run(host='0.0.0.0', port=8090)
