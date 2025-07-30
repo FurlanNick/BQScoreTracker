@@ -437,24 +437,21 @@
                 const teamName = event.target.value;
                 const quizzerSelects = document.querySelectorAll(`.quizzer-select[name^="quizzer_${teamIndex}_"]`);
 
-                try {
-                    fetch(`/get_quizzers/${teamName}`)
-                        .then(response => response.json())
-                        .then(quizzers => {
-                            console.log('Quizzers:', quizzers);
-                            quizzerSelects.forEach(quizzerSelect => {
-                                quizzerSelect.innerHTML = '<option value=""></option>';
-                                quizzers.forEach(quizzer => {
-                                    const option = document.createElement('option');
-                                    option.value = quizzer.name;
-                                    option.textContent = quizzer.name;
-                                    quizzerSelect.appendChild(option);
-                                });
+                fetch(`/get_quizzers/${teamName}`)
+                    .then(response => response.json())
+                    .then(quizzers => {
+                        alert(JSON.stringify(quizzers));
+                        quizzerSelects.forEach(quizzerSelect => {
+                            quizzerSelect.innerHTML = '<option value=""></option>';
+                            quizzers.forEach(quizzer => {
+                                const option = document.createElement('option');
+                                option.value = quizzer.name;
+                                option.textContent = quizzer.name;
+                                quizzerSelect.appendChild(option);
                             });
                         });
-                } catch (error) {
-                    console.error('Error fetching or parsing quizzers:', error);
-                }
+                    })
+                    .catch(error => console.error('Error:', error));
                 updateTeamScore(teamIndex);
             });
         });
