@@ -436,6 +436,7 @@
                 fetch(`/get_quizzers/${teamName}`)
                     .then(response => response.json())
                     .then(quizzers => {
+                        console.log(quizzers);
                         quizzerSelects.forEach(quizzerSelect => {
                             quizzerSelect.innerHTML = '<option value=""></option>';
                             quizzers.forEach(quizzer => {
