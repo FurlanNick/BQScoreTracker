@@ -12,20 +12,39 @@ document.addEventListener('DOMContentLoaded', function() {
             const teamName = event.target.value;
             const quizzerSelects = document.querySelectorAll(`.quizzer-select[name^="quizzer_${teamIndex}_"]`);
 
-            fetch(`/get_quizzers/${teamName}`)
-                .then(response => response.json())
-                .then(quizzers => {
-                    quizzerSelects.forEach(quizzerSelect => {
-                        quizzerSelect.innerHTML = '<option value=""></option>';
-                        quizzers.forEach(quizzer => {
-                            const option = document.createElement('option');
-                            option.value = quizzer.name;
-                            option.textContent = quizzer.name;
-                            quizzerSelect.appendChild(option);
+            quizzerSelects.forEach(quizzerSelect => {
+                quizzerSelect.innerHTML = '<option value=""></option>';
+            });
+
+            if (teamName) {
+                fetch(`/get_quizzers/${teamName}`)
+                    .then(response => response.json())
+                    .then(quizzers => {
+                        quizzerSelects.forEach(quizzerSelect => {
+                            const selectedQuizzer = quizzerSelect.value;
+                            quizzerSelect.innerHTML = '<option value=""></option>';
+                            quizzers.forEach(quizzer => {
+                                const option = document.createElement('option');
+                                option.value = quizzer.name;
+                                option.textContent = quizzer.name;
+                                quizzerSelect.appendChild(option);
+                            });
+                            quizzerSelect.value = selectedQuizzer;
                         });
-                    });
-                })
-                .catch(error => console.error('Error:', error));
+
+                        quizzerSelects.forEach(select => {
+                            select.addEventListener('change', () => {
+                                const selectedQuizzers = Array.from(quizzerSelects).map(s => s.value);
+                                quizzerSelects.forEach(s => {
+                                    Array.from(s.options).forEach(o => {
+                                        o.disabled = selectedQuizzers.includes(o.value) && o.value !== s.value;
+                                    });
+                                });
+                            });
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
             updateTeamScore(teamIndex);
         });
     });
@@ -39,95 +58,52 @@ document.addEventListener('DOMContentLoaded', function() {
             score += 20;
         }
 
-        const scoreSelects = document.querySelectorAll(`select[name^="score_${teamIndex}_"]`);
-        let correctQuizzers = new Set();
-        let personalErrors = {};
-        let teamErrors = 0;
-        let fouls = 0;
-
-        scoreSelects.forEach(scoreSelect => {
-            const quizzerSelect = scoreSelect.parentElement.previousElementSibling.querySelector('.quizzer-select');
-            const quizzerName = quizzerSelect.value;
-
-            if (scoreSelect.value === 'C') {
-                score += 20;
-                if (quizzerName) {
-                    correctQuizzers.add(quizzerName);
-                }
-            } else if (scoreSelect.value === 'E') {
-                teamErrors++;
-                if (quizzerName) {
-                    if (!personalErrors[quizzerName]) {
-                        personalErrors[quizzerName] = 0;
-                    }
-                    personalErrors[quizzerName]++;
-                    if (personalErrors[quizzerName] > 1) {
-                        score -= 10;
-                    }
-                }
-                if (teamErrors > 2) {
-                    score -= 10;
-                }
-            } else if (scoreSelect.value === 'B') {
-                const questionNumberString = scoreSelect.name.split('_')[3];
-                const questionNumber = parseInt(questionNumberString);
-                if (questionNumber <= 16) {
-                    score += 20;
-                } else {
-                    score += 10;
-                }
-            } else if (scoreSelect.value === 'F') {
-                fouls++;
-                if (fouls > 2) {
-                    score -= 10;
-                }
-            }
-        });
-
-        if (correctQuizzers.size >= 3) {
-            score += 10;
-        }
-        if (correctQuizzers.size >= 4) {
-            score += 10;
-        }
-        if (correctQuizzers.size >= 5) {
-            score += 10;
-        }
-
-        teamScoreEl.textContent = score;
-
         let runningTotal = 0;
-        const onTimeCheckbox = document.querySelector(`input[name="on_time_${teamIndex}"]`);
         if (onTimeCheckbox.checked) {
             runningTotal = 20;
         }
 
         for (let i = 1; i <= 26; i++) {
             const scoreSelectsInQuestion = document.querySelectorAll(`select[name^="score_${teamIndex}_"][name$="_${i}"], select[name^="score_${teamIndex}_"][name$="_${i}b"]`);
+            let questionScore = 0;
+            let correctQuizzersThisQuestion = new Set();
+
             scoreSelectsInQuestion.forEach(scoreSelect => {
+                const quizzerSelect = scoreSelect.parentElement.previousElementSibling.querySelector('.quizzer-select');
+                const quizzerName = quizzerSelect.value;
+
                 if (scoreSelect.value === 'C') {
-                    runningTotal += 20;
+                    questionScore += 20;
+                    if(quizzerName) correctQuizzersThisQuestion.add(quizzerName);
                 } else if (scoreSelect.value === 'E') {
                     // This logic needs to be improved to handle team and personal errors correctly
-                    runningTotal -= 10;
+                    questionScore -= 10;
                 } else if (scoreSelect.value === 'B') {
                     const questionNumberString = scoreSelect.name.split('_')[3];
                     const questionNumber = parseInt(questionNumberString);
                     if (questionNumber <= 16) {
-                        runningTotal += 20;
+                        questionScore += 20;
                     } else {
-                        runningTotal += 10;
+                        questionScore += 10;
                     }
                 } else if (scoreSelect.value === 'F') {
                     // This logic needs to be improved to handle fouls correctly
-                    runningTotal -= 10;
+                    questionScore -= 10;
                 }
             });
+
+            if(correctQuizzersThisQuestion.size >= 3) questionScore += 10;
+            if(correctQuizzersThisQuestion.size >= 4) questionScore += 10;
+            if(correctQuizzersThisQuestion.size >= 5) questionScore += 10;
+
+            runningTotal += questionScore;
+
             const runningTotalEl = document.getElementById(`running_total_${teamIndex}_${i}`);
             if(runningTotalEl) {
                 runningTotalEl.textContent = runningTotal;
             }
         }
+        teamScoreEl.textContent = runningTotal;
     }
 
     const onTimeCheckboxes = document.querySelectorAll('input[name^="on_time_"]');

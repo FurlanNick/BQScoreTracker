@@ -325,6 +325,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            form.addEventListener('change', () => {
+                const formData = new FormData(form);
+                fetch(`/edit_quiz/{{ quiz_name }}`, {
+                    method: 'POST',
+                    body: formData
+                });
+            });
+
             const teamSelects = document.querySelectorAll('select[name^="team_"]');
 
             teamSelects.forEach((select, index) => {
@@ -342,11 +351,25 @@
                             .then(response => response.json())
                             .then(quizzers => {
                                 quizzerSelects.forEach(quizzerSelect => {
+                                    const selectedQuizzer = quizzerSelect.value;
+                                    quizzerSelect.innerHTML = '<option value=""></option>';
                                     quizzers.forEach(quizzer => {
                                         const option = document.createElement('option');
                                         option.value = quizzer.name;
                                         option.textContent = quizzer.name;
                                         quizzerSelect.appendChild(option);
+                                    });
+                                    quizzerSelect.value = selectedQuizzer;
+                                });
+
+                                quizzerSelects.forEach(select => {
+                                    select.addEventListener('change', () => {
+                                        const selectedQuizzers = Array.from(quizzerSelects).map(s => s.value);
+                                        quizzerSelects.forEach(s => {
+                                            Array.from(s.options).forEach(o => {
+                                                o.disabled = selectedQuizzers.includes(o.value) && o.value !== s.value;
+                                            });
+                                        });
                                     });
                                 });
                             })
