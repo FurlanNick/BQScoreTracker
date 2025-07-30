@@ -297,7 +297,7 @@ def create_team():
 
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('INSERT INTO teams (name, district) VALUES (?, ?)', (team_name, ''))
+        cur.execute('INSERT INTO teams (name, district, coach) VALUES (?, ?, ?)', (team_name, '', coaches[0]))
         team_id = cur.lastrowid
 
         for quizzer_name in quizzers:
@@ -332,7 +332,7 @@ def team_info():
         quizzers = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team['id'],)).fetchall()
         team_dict['quizzers'] = [quizzer['name'] for quizzer in quizzers]
 
-        coaches = conn.execute('SELECT * FROM users WHERE role = ? AND district = ?', ('Coach', team['name'])).fetchall()
+        coaches = conn.execute('SELECT * FROM users WHERE role = ? AND username = ?', ('Coach', team['coach'])).fetchall()
         team_dict['coaches'] = [coach['username'] for coach in coaches]
 
         teams.append(team_dict)
@@ -386,14 +386,6 @@ def view_db():
     quizzers = conn.execute('SELECT * FROM quizzers').fetchall()
     conn.close()
     return json.dumps({'teams': [dict(row) for row in teams], 'quizzers': [dict(row) for row in quizzers]})
-
-@app.route('/test_dropdowns')
-def test_dropdowns():
-    conn = get_db_connection()
-    teams_from_db = conn.execute('SELECT * FROM teams').fetchall()
-    teams = [dict(row) for row in teams_from_db]
-    conn.close()
-    return render_template('test_dropdowns.html', teams=teams)
 
 if __name__ == '__main__':
     init_db()
