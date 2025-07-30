@@ -15,7 +15,7 @@
         </tr>
         {% for team in teams %}
         <tr>
-            <td>{{ team.name }}</td>
+            <td><a href="/edit_team/{{ team.id }}">{{ team.name }}</a></td>
             <td>
                 <ul>
                     {% for coach in team.coaches %}
