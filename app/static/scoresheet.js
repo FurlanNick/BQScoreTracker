@@ -1,11 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const teamsData = JSON.parse(document.getElementById('teams-data').textContent);
-    const teams = {};
-    for (const team of teamsData) {
-        teams[team.name] = team;
-    }
-
     const teamSelects = document.querySelectorAll('select[name^="team_"]');
+
     teamSelects.forEach((select, index) => {
         const teamIndex = index + 1;
         select.addEventListener('change', (event) => {
@@ -45,7 +40,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .catch(error => console.error('Error:', error));
             }
-            updateTeamScore(teamIndex);
+        });
+    });
+
+    const form = document.querySelector('form');
+    form.addEventListener('change', () => {
+        const formData = new FormData(form);
+        fetch(`/edit_quiz/{{ quiz_name }}`, {
+            method: 'POST',
+            body: formData
         });
     });
 

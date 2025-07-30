@@ -332,8 +332,7 @@ def team_info():
         quizzers = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team['id'],)).fetchall()
         team_dict['quizzers'] = [quizzer['name'] for quizzer in quizzers]
 
-        coaches = conn.execute('SELECT * FROM users WHERE role = ? AND username = ?', ('Coach', team['coach'])).fetchall()
-        team_dict['coaches'] = [coach['username'] for coach in coaches]
+        team_dict['coaches'] = [team['coach']]
 
         teams.append(team_dict)
 
