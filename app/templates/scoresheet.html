@@ -326,9 +326,9 @@
     <script>
         const teamsData = {{ teams | tojson }};
         const teams = {};
-        teamsData.forEach(team => {
+        for (const team of teamsData) {
             teams[team.name] = team;
-        });
+        }
 
         function updateTeamScore(teamIndex) {
             const teamScoreEl = document.getElementById(`team_score_${teamIndex}`);
