@@ -291,6 +291,63 @@ def get_quizzers(team_name):
     print(quizzers)
     return json.dumps([dict(row) for row in quizzers])
 
+@app.route('/team_info')
+def team_info():
+    conn = get_db_connection()
+    teams_from_db = conn.execute('SELECT * FROM teams ORDER BY name').fetchall()
+    teams = []
+    for team in teams_from_db:
+        team_dict = dict(team)
+        quizzers = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team['id'],)).fetchall()
+        team_dict['quizzers'] = [quizzer['name'] for quizzer in quizzers]
+
+        # This is a placeholder for fetching coach names
+        team_dict['coaches'] = []
+
+        teams.append(team_dict)
+
+    conn.close()
+    return render_template('team_info.html', teams=teams)
+
+@app.route('/edit_team/<int:team_id>', methods=['GET', 'POST'])
+@role_required('Admin')
+def edit_team(team_id):
+    conn = get_db_connection()
+
+    if request.method == 'POST':
+        team_name = request.form['team_name']
+        coaches = request.form.getlist('coaches')
+        quizzers = request.form.getlist('quizzers')
+
+        conn.execute('UPDATE teams SET name = ? WHERE id = ?', (team_name, team_id))
+
+        conn.execute('DELETE FROM quizzers WHERE team_id = ?', (team_id,))
+        for quizzer_name in quizzers:
+            conn.execute('INSERT INTO quizzers (name, team_id) VALUES (?, ?)', (quizzer_name, team_id))
+
+        conn.commit()
+        conn.close()
+        return redirect(url_for('team_info'))
+
+    team_from_db = conn.execute('SELECT * FROM teams WHERE id = ?', (team_id,)).fetchone()
+    team = dict(team_from_db)
+    quizzers_from_db = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team_id,)).fetchall()
+    team['quizzers'] = [quizzer['name'] for quizzer in quizzers_from_db]
+    team['coaches'] = [] # Placeholder
+
+    conn.close()
+    return render_template('edit_team.html', team=team)
+
+@app.route('/delete_team/<int:team_id>', methods=['POST'])
+@role_required('Admin')
+def delete_team(team_id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM teams WHERE id = ?', (team_id,))
+    conn.execute('DELETE FROM quizzers WHERE team_id = ?', (team_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('team_info'))
+
 if __name__ == '__main__':
     init_db()
     app.run(host='0.0.0.0', port=8090)
