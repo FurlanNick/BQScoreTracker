@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/edit_quiz/${quizName}`, {
             method: 'POST',
             body: new URLSearchParams(formData)
+        }).then(() => {
+            alert('Scoresheet saved!');
         });
     });
 
