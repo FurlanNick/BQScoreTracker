@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const form = document.getElementById('scoresheet-form');
-    form.addEventListener('change', () => {
+    form.addEventListener('change', (e) => {
         const formData = new FormData(form);
-        console.log(...formData.entries());
-        fetch(`/edit_quiz/{{ quiz_name }}`, {
+        const quizName = document.querySelector('input[name="quiz_name"]').value;
+        fetch(`/edit_quiz/${quizName}`, {
             method: 'POST',
             body: formData
         });
