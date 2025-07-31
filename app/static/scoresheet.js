@@ -44,14 +44,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const form = document.getElementById('scoresheet-form');
-    form.addEventListener('change', (e) => {
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
         const formData = new FormData(form);
         const quizName = document.querySelector('input[name="quiz_name"]').value;
         fetch(`/edit_quiz/${quizName}`, {
             method: 'POST',
             body: new URLSearchParams(formData)
         });
+    });
 
+    form.addEventListener('change', () => {
         for (let i = 1; i <= 3; i++) {
             updateTeamScore(i);
         }
