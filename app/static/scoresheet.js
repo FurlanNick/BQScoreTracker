@@ -12,9 +12,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (teamName) {
+                alert('fetching quizzers for' + teamName);
                 fetch(`/get_quizzers/${teamName}`)
                     .then(response => response.json())
                     .then(quizzers => {
+                        alert('quizzers received: ' + JSON.stringify(quizzers));
                         quizzerSelects.forEach(quizzerSelect => {
                             const selectedQuizzer = quizzerSelect.value;
                             quizzerSelect.innerHTML = '<option value=""></option>';
