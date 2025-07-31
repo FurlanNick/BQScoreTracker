@@ -300,15 +300,7 @@ def edit_quiz(quiz_name):
     data = json.dumps(request.form)
 
     conn = get_db_connection()
-    quiz = conn.execute('SELECT * FROM quizzes WHERE name = ?', (quiz_name,)).fetchone()
-    if not quiz:
-        conn.execute('INSERT INTO quizzes (name) VALUES (?)', (quiz_name,))
-        quiz_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
-    else:
-        quiz_id = quiz['id']
-
     conn.execute('INSERT OR REPLACE INTO scoresheets (quiz_name, data) VALUES (?, ?)', (quiz_name, data))
-
     conn.commit()
     conn.close()
 

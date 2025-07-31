@@ -36,15 +36,3 @@ CREATE TABLE IF NOT EXISTS quizzes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS scores (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    quiz_id INTEGER NOT NULL,
-    team_id INTEGER NOT NULL,
-    quizzer_id INTEGER NOT NULL,
-    question_number INTEGER NOT NULL,
-    score TEXT NOT NULL,
-    FOREIGN KEY (quiz_id) REFERENCES quizzes (id),
-    FOREIGN KEY (team_id) REFERENCES teams (id),
-    FOREIGN KEY (quizzer_id) REFERENCES quizzers (id)
-);
