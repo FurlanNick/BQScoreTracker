@@ -155,7 +155,7 @@ def rooms(meet_number):
 def quiz_list(meet_number, room_number):
     return render_template('quiz-list.html', meet_number=meet_number, room_number=room_number)
 
-@app.route('/quiz/<quiz_name>')
+@app.route('/quiz/<quiz_name>', methods=['GET', 'POST'])
 def quiz(quiz_name):
     conn = get_db_connection()
     teams_from_db = conn.execute('SELECT * FROM teams').fetchall()
