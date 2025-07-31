@@ -163,15 +163,17 @@ def quiz(quiz_name):
     users_from_db = conn.execute('SELECT * FROM users').fetchall()
     users = [dict(row) for row in users_from_db]
 
-    scoresheet_data = conn.execute('SELECT data FROM scoresheets WHERE quiz_name = ?', (quiz_name,)).fetchone()
+    quiz = conn.execute('SELECT * FROM quizzes WHERE name = ?', (quiz_name,)).fetchone()
+    scores = {}
+    if quiz:
+        scores_from_db = conn.execute('SELECT * FROM scores WHERE quiz_id = ?', (quiz['id'],)).fetchall()
+        for score in scores_from_db:
+            key = f"score_{score['team_id']}_{score['quizzer_id']}_{score['question_number']}"
+            scores[key] = score['score']
+
     conn.close()
 
-    if scoresheet_data:
-        scoresheet_data = json.loads(scoresheet_data['data'])
-    else:
-        scoresheet_data = {}
-
-    return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams, scoresheet_data=scoresheet_data)
+    return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams, scores=scores)
 
 @app.route('/accounts')
 @role_required('Admin')
@@ -297,10 +299,31 @@ def edit_quiz(quiz_name):
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    data = json.dumps(request.form)
-
     conn = get_db_connection()
-    conn.execute('INSERT OR REPLACE INTO scoresheets (quiz_name, data) VALUES (?, ?)', (quiz_name, data))
+    quiz = conn.execute('SELECT * FROM quizzes WHERE name = ?', (quiz_name,)).fetchone()
+    if not quiz:
+        conn.execute('INSERT INTO quizzes (name) VALUES (?)', (quiz_name,))
+        quiz_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+    else:
+        quiz_id = quiz['id']
+
+    for key, value in request.form.items():
+        if key.startswith('score_'):
+            parts = key.split('_')
+            team_id = parts[1]
+            quizzer_index = parts[2]
+            question_number = parts[3]
+
+            team_name = request.form.get(f'team_{team_id}')
+            quizzer_name = request.form.get(f'quizzer_{team_id}_{quizzer_index}')
+
+            if team_name and quizzer_name:
+                team = conn.execute('SELECT * FROM teams WHERE name = ?', (team_name,)).fetchone()
+                quizzer = conn.execute('SELECT * FROM quizzers WHERE name = ? AND team_id = ?', (quizzer_name, team['id'])).fetchone()
+                if team and quizzer:
+                    conn.execute('INSERT OR REPLACE INTO scores (quiz_id, team_id, quizzer_id, question_number, score) VALUES (?, ?, ?, ?, ?)',
+                                 (quiz_id, team['id'], quizzer['id'], question_number, value))
+
     conn.commit()
     conn.close()
 
