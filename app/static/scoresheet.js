@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('scoresheet-form');
     form.addEventListener('change', () => {
         const formData = new FormData(form);
+        console.log(...formData.entries());
         fetch(`/edit_quiz/{{ quiz_name }}`, {
             method: 'POST',
             body: formData
