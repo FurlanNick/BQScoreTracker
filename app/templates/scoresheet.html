@@ -110,14 +110,14 @@
             {% for j in range(1, 27) %}
             <td class="question-col">
                 <select name="score_1_{{ i }}_{{ j }}">
-                    <option value="" {% if scoresheet_data and scoresheet_data['score_1_' + i|string + '_' + j|string] == '' %}selected{% endif %}></option>
-                    <option value="C" {% if scoresheet_data and scoresheet_data['score_1_' + i|string + '_' + j|string] == 'C' %}selected{% endif %}>C</option>
-                    <option value="B" {% if scoresheet_data and scoresheet_data['score_1_' + i|string + '_' + j|string] == 'B' %}selected{% endif %}>B</option>
-                    <option value="E" {% if scoresheet_data and scoresheet_data['score_1_' + i|string + '_' + j|string] == 'E' %}selected{% endif %}>E</option>
-                    <option value="BE" {% if scoresheet_data and scoresheet_data['score_1_' + i|string + '_' + j|string] == 'BE' %}selected{% endif %}>BE</option>
-                    <option value="F" {% if scoresheet_data and scoresheet_data['score_1_' + i|string + '_' + j|string] == 'F' %}selected{% endif %}>F</option>
-                    <option value="OUT" {% if scoresheet_data and scoresheet_data['score_1_' + i|string + '_' + j|string] == 'OUT' %}selected{% endif %}>OUT</option>
-                    <option value="IN" {% if scoresheet_data and scoresheet_data['score_1_' + i|string + '_' + j|string] == 'IN' %}selected{% endif %}>IN</option>
+                    <option value="" {% if scores['score_1_' + i|string + '_' + j|string] is not defined or scores['score_1_' + i|string + '_' + j|string] == '' %}selected{% endif %}></option>
+                    <option value="C" {% if scores['score_1_' + i|string + '_' + j|string] == 'C' %}selected{% endif %}>C</option>
+                    <option value="B" {% if scores['score_1_' + i|string + '_' + j|string] == 'B' %}selected{% endif %}>B</option>
+                    <option value="E" {% if scores['score_1_' + i|string + '_' + j|string] == 'E' %}selected{% endif %}>E</option>
+                    <option value="BE" {% if scores['score_1_' + i|string + '_' + j|string] == 'BE' %}selected{% endif %}>BE</option>
+                    <option value="F" {% if scores['score_1_' + i|string + '_' + j|string] == 'F' %}selected{% endif %}>F</option>
+                    <option value="OUT" {% if scores['score_1_' + i|string + '_' + j|string] == 'OUT' %}selected{% endif %}>OUT</option>
+                    <option value="IN" {% if scores['score_1_' + i|string + '_' + j|string] == 'IN' %}selected{% endif %}>IN</option>
                 </select>
             </td>
             {% endfor %}
@@ -185,14 +185,14 @@
             {% for j in range(1, 27) %}
             <td class="question-col">
                 <select name="score_2_{{ i }}_{{ j }}">
-                    <option value="" {% if scoresheet_data and scoresheet_data['score_2_' + i|string + '_' + j|string] == '' %}selected{% endif %}></option>
-                    <option value="C" {% if scoresheet_data and scoresheet_data['score_2_' + i|string + '_' + j|string] == 'C' %}selected{% endif %}>C</option>
-                    <option value="B" {% if scoresheet_data and scoresheet_data['score_2_' + i|string + '_' + j|string] == 'B' %}selected{% endif %}>B</option>
-                    <option value="E" {% if scoresheet_data and scoresheet_data['score_2_' + i|string + '_' + j|string] == 'E' %}selected{% endif %}>E</option>
-                    <option value="BE" {% if scoresheet_data and scoresheet_data['score_2_' + i|string + '_' + j|string] == 'BE' %}selected{% endif %}>BE</option>
-                    <option value="F" {% if scoresheet_data and scoresheet_data['score_2_' + i|string + '_' + j|string] == 'F' %}selected{% endif %}>F</option>
-                    <option value="OUT" {% if scoresheet_data and scoresheet_data['score_2_' + i|string + '_' + j|string] == 'OUT' %}selected{% endif %}>OUT</option>
-                    <option value="IN" {% if scoresheet_data and scoresheet_data['score_2_' + i|string + '_' + j|string] == 'IN' %}selected{% endif %}>IN</option>
+                    <option value="" {% if scores['score_2_' + i|string + '_' + j|string] is not defined or scores['score_2_' + i|string + '_' + j|string] == '' %}selected{% endif %}></option>
+                    <option value="C" {% if scores['score_2_' + i|string + '_' + j|string] == 'C' %}selected{% endif %}>C</option>
+                    <option value="B" {% if scores['score_2_' + i|string + '_' + j|string] == 'B' %}selected{% endif %}>B</option>
+                    <option value="E" {% if scores['score_2_' + i|string + '_' + j|string] == 'E' %}selected{% endif %}>E</option>
+                    <option value="BE" {% if scores['score_2_' + i|string + '_' + j|string] == 'BE' %}selected{% endif %}>BE</option>
+                    <option value="F" {% if scores['score_2_' + i|string + '_' + j|string] == 'F' %}selected{% endif %}>F</option>
+                    <option value="OUT" {% if scores['score_2_' + i|string + '_' + j|string] == 'OUT' %}selected{% endif %}>OUT</option>
+                    <option value="IN" {% if scores['score_2_' + i|string + '_' + j|string] == 'IN' %}selected{% endif %}>IN</option>
                 </select>
             </td>
             {% endfor %}
@@ -260,14 +260,14 @@
             {% for j in range(1, 27) %}
             <td class="question-col">
                 <select name="score_3_{{ i }}_{{ j }}">
-                    <option value="" {% if scoresheet_data and scoresheet_data['score_3_' + i|string + '_' + j|string] == '' %}selected{% endif %}></option>
-                    <option value="C" {% if scoresheet_data and scoresheet_data['score_3_' + i|string + '_' + j|string] == 'C' %}selected{% endif %}>C</option>
-                    <option value="B" {% if scoresheet_data and scoresheet_data['score_3_' + i|string + '_' + j|string] == 'B' %}selected{% endif %}>B</option>
-                    <option value="E" {% if scoresheet_data and scoresheet_data['score_3_' + i|string + '_' + j|string] == 'E' %}selected{% endif %}>E</option>
-                    <option value="BE" {% if scoresheet_data and scoresheet_data['score_3_' + i|string + '_' + j|string] == 'BE' %}selected{% endif %}>BE</option>
-                    <option value="F" {% if scoresheet_data and scoresheet_data['score_3_' + i|string + '_' + j|string] == 'F' %}selected{% endif %}>F</option>
-                    <option value="OUT" {% if scoresheet_data and scoresheet_data['score_3_' + i|string + '_' + j|string] == 'OUT' %}selected{% endif %}>OUT</option>
-                    <option value="IN" {% if scoresheet_data and scoresheet_data['score_3_' + i|string + '_' + j|string] == 'IN' %}selected{% endif %}>IN</option>
+                    <option value="" {% if scores['score_3_' + i|string + '_' + j|string] is not defined or scores['score_3_' + i|string + '_' + j|string] == '' %}selected{% endif %}></option>
+                    <option value="C" {% if scores['score_3_' + i|string + '_' + j|string] == 'C' %}selected{% endif %}>C</option>
+                    <option value="B" {% if scores['score_3_' + i|string + '_' + j|string] == 'B' %}selected{% endif %}>B</option>
+                    <option value="E" {% if scores['score_3_' + i|string + '_' + j|string] == 'E' %}selected{% endif %}>E</option>
+                    <option value="BE" {% if scores['score_3_' + i|string + '_' + j|string] == 'BE' %}selected{% endif %}>BE</option>
+                    <option value="F" {% if scores['score_3_' + i|string + '_' + j|string] == 'F' %}selected{% endif %}>F</option>
+                    <option value="OUT" {% if scores['score_3_' + i|string + '_' + j|string] == 'OUT' %}selected{% endif %}>OUT</option>
+                    <option value="IN" {% if scores['score_3_' + i|string + '_' + j|string] == 'IN' %}selected{% endif %}>IN</option>
                 </select>
             </td>
             {% endfor %}
