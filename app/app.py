@@ -174,6 +174,8 @@ def quiz(quiz_name):
 
     if scoresheet_data:
         scoresheet_data = json.loads(scoresheet_data['data'])
+    else:
+        scoresheet_data = {}
 
     return render_template('scoresheet.html', quiz_name=quiz_name, users=users, teams=teams, scoresheet_data=scoresheet_data)
 
