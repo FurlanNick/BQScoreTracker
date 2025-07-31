@@ -30,7 +30,7 @@ def init_db():
 
         for team_data in teams_data:
             cur = db.cursor()
-            cur.execute('INSERT INTO teams (name, district) VALUES (?, ?)', (team_data['name'], ''))
+            cur.execute('INSERT INTO teams (name, district, coach) VALUES (?, ?, ?)', (team_data['name'], '', team_data['coach']))
             team_id = cur.lastrowid
 
             db.execute('INSERT INTO users (username, password, district, role) VALUES (?, ?, ?, ?)',
@@ -277,11 +277,25 @@ def edit_quiz(quiz_name):
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    data = json.dumps(request.form)
-    print(data)
-
     conn = get_db_connection()
-    conn.execute('INSERT OR REPLACE INTO scoresheets (quiz_name, data) VALUES (?, ?)', (quiz_name, data))
+    quiz = conn.execute('SELECT * FROM quizzes WHERE name = ?', (quiz_name,)).fetchone()
+    if not quiz:
+        conn.execute('INSERT INTO quizzes (name) VALUES (?)', (quiz_name,))
+        quiz_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+    else:
+        quiz_id = quiz['id']
+
+    for key, value in request.form.items():
+        if key.startswith('score_'):
+            parts = key.split('_')
+            team_id = parts[1]
+            quizzer_id = parts[2]
+            question_number = parts[3]
+
+            # This is a placeholder for getting the actual quizzer_id
+            conn.execute('INSERT OR REPLACE INTO scores (quiz_id, team_id, quizzer_id, question_number, score) VALUES (?, ?, ?, ?, ?)',
+                         (quiz_id, team_id, 0, question_number, value))
+
     conn.commit()
     conn.close()
 
@@ -333,7 +347,8 @@ def team_info():
         quizzers = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team['id'],)).fetchall()
         team_dict['quizzers'] = [quizzer['name'] for quizzer in quizzers]
 
-        team_dict['coaches'] = [team['coach']]
+        coaches = conn.execute('SELECT * FROM users WHERE role = ? AND username = ?', ('Coach', team['coach'])).fetchall()
+        team_dict['coaches'] = [coach['username'] for coach in coaches]
 
         teams.append(team_dict)
 
