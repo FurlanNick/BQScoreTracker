@@ -278,6 +278,7 @@ def edit_quiz(quiz_name):
         return redirect(url_for('login'))
 
     data = json.dumps(request.form)
+    print(data)
 
     conn = get_db_connection()
     conn.execute('INSERT OR REPLACE INTO scoresheets (quiz_name, data) VALUES (?, ?)', (quiz_name, data))
