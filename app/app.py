@@ -371,6 +371,17 @@ def delete_team(team_id):
     conn.close()
     return redirect(url_for('team_info'))
 
+@app.route('/get_quizzers/<team_name>')
+def get_quizzers(team_name):
+    conn = get_db_connection()
+    team = conn.execute('SELECT * FROM teams WHERE name = ?', (team_name,)).fetchone()
+    if team:
+        quizzers = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team['id'],)).fetchall()
+    else:
+        quizzers = []
+    conn.close()
+    return json.dumps([dict(row) for row in quizzers])
+
 @app.route('/view_db')
 def view_db():
     conn = get_db_connection()
