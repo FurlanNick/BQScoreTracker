@@ -18,6 +18,8 @@
 </head>
 <body>
     <h1>Scoresheet</h1>
+    <form id="scoresheet-form">
+    <input type="hidden" name="quiz_name" value="{{ quiz_name }}">
     <table>
         <!-- Header Row -->
         <tr>
@@ -324,6 +326,15 @@
     </table>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('scoresheet-form');
+            form.addEventListener('change', () => {
+                const formData = new FormData(form);
+                fetch(`/edit_quiz/{{ quiz_name }}`, {
+                    method: 'POST',
+                    body: formData
+                });
+            });
+
             const teamSelects = document.querySelectorAll('select[name^="team_"]');
 
             teamSelects.forEach((select, index) => {
