@@ -42,4 +42,74 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    const form = document.getElementById('scoresheet-form');
+    form.addEventListener('change', () => {
+        const formData = new FormData(form);
+        fetch(`/edit_quiz/{{ quiz_name }}`, {
+            method: 'POST',
+            body: formData
+        });
+
+        for(let i = 1; i <= 3; i++) {
+            updateTeamScore(i);
+        }
+    });
+
+    function updateTeamScore(teamIndex) {
+        const teamScoreEl = document.getElementById(`team_score_${teamIndex}`);
+        let score = 0;
+
+        const onTimeCheckbox = document.querySelector(`input[name="on_time_${teamIndex}"]`);
+        if (onTimeCheckbox.checked) {
+            score += 20;
+        }
+
+        let runningTotal = 0;
+        if (onTimeCheckbox.checked) {
+            runningTotal = 20;
+        }
+
+        for (let i = 1; i <= 26; i++) {
+            const scoreSelectsInQuestion = document.querySelectorAll(`select[name^="score_${teamIndex}_"][name$="_${i}"], select[name^="score_${teamIndex}_"][name$="_${i}b"]`);
+            let questionScore = 0;
+            let correctQuizzersThisQuestion = new Set();
+
+            scoreSelectsInQuestion.forEach(scoreSelect => {
+                const quizzerSelect = scoreSelect.parentElement.previousElementSibling.querySelector('.quizzer-select');
+                const quizzerName = quizzerSelect.value;
+
+                if (scoreSelect.value === 'C') {
+                    questionScore += 20;
+                    if(quizzerName) correctQuizzersThisQuestion.add(quizzerName);
+                } else if (scoreSelect.value === 'E') {
+                    // This logic needs to be improved to handle team and personal errors correctly
+                    questionScore -= 10;
+                } else if (scoreSelect.value === 'B') {
+                    const questionNumberString = scoreSelect.name.split('_')[3];
+                    const questionNumber = parseInt(questionNumberString);
+                    if (questionNumber <= 16) {
+                        questionScore += 20;
+                    } else {
+                        questionScore += 10;
+                    }
+                } else if (scoreSelect.value === 'F') {
+                    // This logic needs to be improved to handle fouls correctly
+                    questionScore -= 10;
+                }
+            });
+
+            if(correctQuizzersThisQuestion.size >= 3) questionScore += 10;
+            if(correctQuizzersThisQuestion.size >= 4) questionScore += 10;
+            if(correctQuizzersThisQuestion.size >= 5) questionScore += 10;
+
+            runningTotal += questionScore;
+
+            const runningTotalEl = document.getElementById(`running_total_${teamIndex}_${i}`);
+            if(runningTotalEl) {
+                runningTotalEl.textContent = runningTotal;
+            }
+        }
+        teamScoreEl.textContent = runningTotal;
+    }
 });
