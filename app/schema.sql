@@ -2,6 +2,8 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS quizzers;
 DROP TABLE IF EXISTS districts;
+DROP TABLE IF EXISTS quizzes;
+DROP TABLE IF EXISTS scores;
 
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,8 +32,19 @@ CREATE TABLE IF NOT EXISTS districts (
     name TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS scoresheets (
+CREATE TABLE IF NOT EXISTS quizzes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    quiz_name TEXT NOT NULL,
-    data TEXT NOT NULL
+    name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS scores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quiz_id INTEGER NOT NULL,
+    team_id INTEGER NOT NULL,
+    quizzer_id INTEGER NOT NULL,
+    question_number INTEGER NOT NULL,
+    score TEXT NOT NULL,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes (id),
+    FOREIGN KEY (team_id) REFERENCES teams (id),
+    FOREIGN KEY (quizzer_id) REFERENCES quizzers (id)
 );

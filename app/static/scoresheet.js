@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const form = document.getElementById('scoresheet-form');
-    form.addEventListener('change', (e) => {
+    form.addEventListener('change', () => {
         const formData = new FormData(form);
         const quizName = document.querySelector('input[name="quiz_name"]').value;
         fetch(`/edit_quiz/${quizName}`, {
