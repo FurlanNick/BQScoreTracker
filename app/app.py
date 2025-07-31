@@ -1,7 +1,7 @@
+import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session
 import json
-
-import sqlite3
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'  # This should be a random, secret value
@@ -43,8 +43,6 @@ def init_db():
 
 # In-memory quiz database
 quizzes = {}
-
-from functools import wraps
 
 def role_required(required_role):
     def decorator(f):
@@ -105,10 +103,6 @@ def calculate_quizzer_standings(quizzes):
     standings = [{'name': name, 'score': data['score']} for name, data in quizzer_scores.items()]
     standings.sort(key=lambda x: x['score'], reverse=True)
     return standings
-
-def parse_quiz_template():
-    with open('../template.json', 'r') as f:
-        return json.load(f)
 
 @app.route('/')
 def index():
@@ -235,6 +229,18 @@ def delete_user(user_id):
     conn.close()
     return redirect(url_for('accounts'))
 
+@app.route('/add_district', methods=['POST'])
+@role_required('Admin')
+def add_district():
+    new_district = request.form['new_district']
+
+    conn = get_db_connection()
+    conn.execute('INSERT INTO districts (name) VALUES (?)', (new_district,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('accounts'))
+
 @app.route('/edit_district/<int:district_id>', methods=['GET', 'POST'])
 @role_required('Admin')
 def edit_district(district_id):
@@ -262,47 +268,6 @@ def delete_district(district_id):
     conn.close()
     return redirect(url_for('accounts'))
 
-@app.route('/add_district', methods=['POST'])
-@role_required('Admin')
-def add_district():
-    new_district = request.form['new_district']
-
-    conn = get_db_connection()
-    conn.execute('INSERT INTO districts (name) VALUES (?)', (new_district,))
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for('accounts'))
-
-@app.route('/edit_quiz/<quiz_name>', methods=['POST'])
-def edit_quiz(quiz_name):
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    conn = get_db_connection()
-    quiz = conn.execute('SELECT * FROM quizzes WHERE name = ?', (quiz_name,)).fetchone()
-    if not quiz:
-        conn.execute('INSERT INTO quizzes (name) VALUES (?)', (quiz_name,))
-        quiz_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
-    else:
-        quiz_id = quiz['id']
-
-    for key, value in request.form.items():
-        if key.startswith('score_'):
-            parts = key.split('_')
-            team_id = parts[1]
-            quizzer_id = parts[2]
-            question_number = parts[3]
-
-            # This is a placeholder for getting the actual quizzer_id
-            conn.execute('INSERT OR REPLACE INTO scores (quiz_id, team_id, quizzer_id, question_number, score) VALUES (?, ?, ?, ?, ?)',
-                         (quiz_id, team_id, 0, question_number, value))
-
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for('quiz', quiz_name=quiz_name))
-
 @app.route('/create_team', methods=['GET', 'POST'])
 def create_team():
     if request.method == 'POST':
@@ -327,17 +292,27 @@ def create_team():
 
     return render_template('create_team.html')
 
-@app.route('/get_quizzers/<team_name>')
-def get_quizzers(team_name):
+@app.route('/edit_quiz/<quiz_name>', methods=['POST'])
+def edit_quiz(quiz_name):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    data = json.dumps(request.form)
+
     conn = get_db_connection()
-    team = conn.execute('SELECT * FROM teams WHERE name = ?', (team_name,)).fetchone()
-    if team:
-        quizzers = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team['id'],)).fetchall()
+    quiz = conn.execute('SELECT * FROM quizzes WHERE name = ?', (quiz_name,)).fetchone()
+    if not quiz:
+        conn.execute('INSERT INTO quizzes (name) VALUES (?)', (quiz_name,))
+        quiz_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
     else:
-        quizzers = []
+        quiz_id = quiz['id']
+
+    conn.execute('INSERT OR REPLACE INTO scoresheets (quiz_name, data) VALUES (?, ?)', (quiz_name, data))
+
+    conn.commit()
     conn.close()
-    print(quizzers)
-    return json.dumps([dict(row) for row in quizzers])
+
+    return ('', 204)
 
 @app.route('/team_info')
 def team_info():
@@ -367,7 +342,7 @@ def edit_team(team_id):
         coaches = request.form.getlist('coaches')
         quizzers = request.form.getlist('quizzers')
 
-        conn.execute('UPDATE teams SET name = ? WHERE id = ?', (team_name, team_id))
+        conn.execute('UPDATE teams SET name = ?, coach = ? WHERE id = ?', (team_name, coaches[0], team_id))
 
         conn.execute('DELETE FROM quizzers WHERE team_id = ?', (team_id,))
         for quizzer_name in quizzers:
@@ -381,7 +356,7 @@ def edit_team(team_id):
     team = dict(team_from_db)
     quizzers_from_db = conn.execute('SELECT * FROM quizzers WHERE team_id = ?', (team_id,)).fetchall()
     team['quizzers'] = [quizzer['name'] for quizzer in quizzers_from_db]
-    team['coaches'] = [] # Placeholder
+    team['coaches'] = [team['coach']]
 
     conn.close()
     return render_template('edit_team.html', team=team)
